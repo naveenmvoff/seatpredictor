@@ -132,13 +132,13 @@ export default function Home() {
         {/* Form */}
         <form
           onSubmit={handleSubmit}
-          className="max-w-6xl mx-auto bg-amber-100 border border-gray-400 p-4 rounded-3xl"
+          className="max-w-6xl mx-auto bg-white  border border-gray-400 p-4 rounded-3xl"
         >
           {/* Course Selection - Only show for NEET PG */}
           {activeTab === "NEET PG" && (
             <div className="mb-6">
               <div className="flex items-center space-x-6">
-                <p className="text-sm font-medium text-gray-700">Course:</p>
+                <p className="text-sm font-bold text-gray-700">Course:</p>
 
                 <label className="flex items-center">
                   <input
@@ -167,99 +167,68 @@ export default function Home() {
             </div>
           )}
 
-          {/* Form Fields - Responsive Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-6">
-            <div className="xl:col-span-1">
-              <input
-                type="text"
-                placeholder="Name"
-                value={formData.name}
-                onChange={(e) => handleInputChange("name", e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
+          {/* Form Fields - Single Horizontal Line */}
+          <div className="flex flex-wrap items-center gap-4 mb-6">
+            <input
+              type="text"
+              placeholder="Name"
+              value={formData.name}
+              onChange={(e) => handleInputChange("name", e.target.value)}
+              className="flex-1 min-w-[150px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
 
-            <div className="xl:col-span-1">
-              <input
-                type="tel"
-                placeholder="Phone Number"
-                value={formData.phone}
-                onChange={(e) => handleInputChange("phone", e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
+            <input
+              type="tel"
+              placeholder="Phone Number"
+              value={formData.phone}
+              onChange={(e) => handleInputChange("phone", e.target.value)}
+              className="flex-1 min-w-[150px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
 
-            <div className="xl:col-span-1">
-              <input
-                type="email"
-                placeholder="Email Address"
-                value={formData.email}
-                onChange={(e) => handleInputChange("email", e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
+            <input
+              type="email"
+              placeholder="Email Address"
+              value={formData.email}
+              onChange={(e) => handleInputChange("email", e.target.value)}
+              className="flex-1 min-w-[150px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
 
-            <div className="xl:col-span-1">
-              <input
-                type="number"
-                placeholder={
-                  activeTab === "NEET PG"
-                    ? "NEET PG 2024 Rank"
-                    : "NEET SS 2024 Rank"
-                }
-                value={formData.rank}
-                onChange={(e) => handleInputChange("rank", e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
+            <input
+              type="number"
+              placeholder={
+                activeTab === "NEET PG"
+                  ? "NEET PG 2024 Rank"
+                  : "NEET SS 2024 Rank"
+              }
+              value={formData.rank}
+              onChange={(e) => handleInputChange("rank", e.target.value)}
+              className="flex-1 min-w-[150px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
 
             {activeTab === "NEET PG" ? (
               <>
-                <div className="xl:col-span-1">
-                  <select
-                    value={formData.state}
-                    onChange={(e) => handleInputChange("state", e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">State</option>
-                    <option value="Andhra Pradesh">Andhra Pradesh</option>
-                    <option value="Delhi">Delhi</option>
-                    <option value="Maharashtra">Maharashtra</option>
-                    <option value="Tamil Nadu">Tamil Nadu</option>
-                    <option value="Karnataka">Karnataka</option>
-                    <option value="Telangana">Telangana</option>
-                    <option value="Chandigarh">Chandigarh</option>
-                    <option value="Puducherry">Puducherry</option>
-                  </select>
-                </div>
-              </>
-            ) : (
-              <div className="xl:col-span-1">
                 <select
-                  value={formData.qualifyingGroup}
-                  onChange={(e) =>
-                    handleInputChange("qualifyingGroup", e.target.value)
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  value={formData.state}
+                  onChange={(e) => handleInputChange("state", e.target.value)}
+                  className="flex-1 min-w-[150px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
-                  <option value="">Qualifying Group</option>
-                  <option value="Group A">Group A</option>
-                  <option value="Group B">Group B</option>
-                  <option value="Group C">Group C</option>
+                  <option value="">State</option>
+                  <option value="Andhra Pradesh">Andhra Pradesh</option>
+                  <option value="Delhi">Delhi</option>
+                  <option value="Maharashtra">Maharashtra</option>
+                  <option value="Tamil Nadu">Tamil Nadu</option>
+                  <option value="Karnataka">Karnataka</option>
+                  <option value="Telangana">Telangana</option>
+                  <option value="Chandigarh">Chandigarh</option>
+                  <option value="Puducherry">Puducherry</option>
                 </select>
-              </div>
-            )}
-          </div>
 
-          {activeTab === "NEET PG" && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-6">
-              <div className="xl:col-span-1">
                 <select
                   value={formData.specialization}
                   onChange={(e) =>
                     handleInputChange("specialization", e.target.value)
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="flex-1 min-w-[150px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="">Specialization</option>
                   <option value="M.D. (Anaesthesiology)">
@@ -274,26 +243,45 @@ export default function Home() {
                   <option value="M.D. (Pediatrics)">M.D. (Pediatrics)</option>
                   <option value="M.D. (Radiology)">M.D. (Radiology)</option>
                 </select>
-              </div>
-              <div className="xl:col-span-3"></div>
-              <div className="xl:col-span-1 flex justify-end">
+
                 <button
                   type="submit"
-                  className="w-full sm:w-auto bg-slate-700 hover:bg-slate-800 text-white px-8 py-2 rounded-md font-medium transition-colors"
+                  className="bg-slate-700 hover:bg-slate-800 text-white px-8 py-2 rounded-md font-medium transition-colors whitespace-nowrap"
                 >
                   Submit
                 </button>
-              </div>
-            </div>
-          )}
+              </>
+            ) : (
+              <>
+                <select
+                  value={formData.qualifyingGroup}
+                  onChange={(e) =>
+                    handleInputChange("qualifyingGroup", e.target.value)
+                  }
+                  className="flex-1 min-w-[150px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="">Qualifying Group</option>
+                  <option value="Group A">Group A</option>
+                  <option value="Group B">Group B</option>
+                  <option value="Group C">Group C</option>
+                </select>
+
+                <button
+                  type="submit"
+                  className="bg-slate-700 hover:bg-slate-800 text-white px-8 py-2 rounded-md font-medium transition-colors whitespace-nowrap"
+                >
+                  Submit
+                </button>
+              </>
+            )}
+          </div>
 
           {/* Category Selection - Only show for NEET PG */}
           {activeTab === "NEET PG" && (
-            <div className="mb-8">
-              <label className="block text-sm font-medium text-gray-700 mb-3">
-                Category:
-              </label>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-10 gap-3">
+            <div className="mb-6">
+              <div className="flex items-center flex-wrap gap-x-6 gap-y-3">
+                <p className="text-sm font-medium text-gray-700">Category:</p>
+                
                 {[
                   "EWS",
                   "EWS PwD",
@@ -324,17 +312,6 @@ export default function Home() {
             </div>
           )}
 
-          {/* Submit Button for NEET SS */}
-          {activeTab === "NEET SS" && (
-            <div className="flex justify-center sm:justify-end mb-8">
-              <button
-                type="submit"
-                className="w-full sm:w-auto bg-slate-700 hover:bg-slate-800 text-white px-8 py-2 rounded-md font-medium transition-colors"
-              >
-                Submit
-              </button>
-            </div>
-          )}
         </form>
       </main>
 
