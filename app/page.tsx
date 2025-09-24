@@ -168,7 +168,7 @@ export default function Home() {
           )}
 
           {/* Form Fields - Single Horizontal Line */}
-          <div className="flex flex-wrap items-center gap-4 mb-6">
+          <div className="flex flex-wrap items-center gap-1 mb-6">
             <input  
               type="text"
               placeholder="Name"
