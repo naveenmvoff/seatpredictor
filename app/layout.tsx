@@ -1,9 +1,13 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
+import { Figtree } from "next/font/google"
 import "./globals.css"
 
-const inter = Inter({ subsets: ["latin"] })
+export const figtree = Figtree({ 
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  variable: "--font-figtree"
+})
 
 export const metadata: Metadata = {
   title: "DOC Tutorials - Seat Predictor",
@@ -18,7 +22,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={`${figtree.variable} ${figtree.className}`}>{children}</body>
     </html>
   )
 }

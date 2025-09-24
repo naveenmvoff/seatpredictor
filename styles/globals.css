@@ -75,8 +75,8 @@
 }
 
 @theme inline {
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-figtree);
+  --font-mono: var(--font-figtree);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -120,6 +120,49 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+  }
+  
+  /* Custom Radio Button Styling */
+  input[type="radio"] {
+    accent-color: var(--radio-blue) !important;
+    color: var(--radio-blue) !important;
+    -webkit-appearance: none;
+    appearance: none;
+    border: 2px solid #d1d5db;
+    border-radius: 50%;
+    background-color: white;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+  }
+  
+  input[type="radio"]:checked {
+    background-color: var(--radio-blue) !important;
+    border-color: var(--radio-blue) !important;
+    background-image: none !important;
+  }
+  
+  input[type="radio"]:checked::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: white;
+    transform: translate(-50%, -50%);
+  }
+  
+  input[type="radio"]:hover {
+    border-color: var(--radio-blue) !important;
+    box-shadow: 0 0 0 1px var(--radio-blue, #1c4464);
+  }
+  
+  input[type="radio"]:focus {
+    outline: none;
+    border-color: var(--radio-blue) !important;
+    box-shadow: 0 0 0 2px rgba(28, 68, 100, 0.2) !important;
   }
 }

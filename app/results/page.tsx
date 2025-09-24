@@ -234,7 +234,7 @@ export default function Results() {
                 <span className="mx-1">•</span>
                 <span>{predictorData.category} Category</span>
               </div>
-              <button className="ml-2 text-blue-600 hover:text-blue-800">
+              <button className="ml-2 text-radio-blue hover:text-slate-800">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
