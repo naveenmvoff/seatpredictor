@@ -337,7 +337,7 @@ export default function Results() {
 
         {/* Filter Section - Responsive */}
         <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6 mb-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 items-end">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 {userData.exam === "NEET PG" ? "NEET PG 2024 Rank" : "NEET SS 2024 Rank"}
@@ -359,7 +359,7 @@ export default function Results() {
                 onChange={(e) => handleInputChange('state', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-1 focus:ring-slate-700 focus:border-transparent"
               >
-                <option value="">All States</option>
+                <option value="" disabled >All States</option>
                 {stateOptions.map((state) => (
                   <option key={state} value={state}>{state}</option>
                 ))}
@@ -375,6 +375,7 @@ export default function Results() {
                 onChange={(e) => handleInputChange('course', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-1 focus:ring-slate-700 focus:border-transparent"
               >
+                <option value="" disabled >Course</option>
                 {courseOptions.map((course) => (
                   <option key={course} value={course}>{course}</option>
                 ))}
@@ -390,7 +391,7 @@ export default function Results() {
                 onChange={(e) => handleInputChange('specialization', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-1 focus:ring-slate-700 focus:border-transparent"
               >
-                <option value="" disabled hidden >All Specializations</option>
+                <option value="" disabled >All Specializations</option>
                 {specializationOptions.map((spec) => (
                   <option key={spec} value={spec}>{spec}</option>
                 ))}
@@ -403,12 +404,12 @@ export default function Results() {
               </label>
               <select
                 value={formData.category}
-                onChange={(e) => handleInputChange('specialization', e.target.value)}
+                onChange={(e) => handleInputChange('category', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-1 focus:ring-slate-700 focus:border-transparent"
               >
-                <option value="">Category</option>
-                {categoryOptions.map((spec) => (
-                  <option key={spec} value={spec}>{spec}</option>
+                <option value="" disabled >All Categories</option>
+                {categoryOptions.map((category) => (
+                  <option key={category} value={category}>{category}</option>
                 ))}
               </select>
             </div>
