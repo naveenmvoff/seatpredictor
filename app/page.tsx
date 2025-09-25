@@ -26,7 +26,7 @@ export default function Home() {
     e.preventDefault();
     // Store form data in sessionStorage for the results page
     sessionStorage.setItem(
-      "predictorData",
+      "userData",
       JSON.stringify({
         ...formData,
         course: selectedCourse,
@@ -105,23 +105,23 @@ export default function Home() {
 
         {/* Exam Tabs */}
         <div className="flex justify-center mb-6 sm:mb-8">
-          <div className="flex bg-gray-200 rounded-lg p-1 w-full max-w-xs">
+          <div className="flex bg-gray-50 rounded-lg p-1 w-full max-w-xs gap-0.5">
             <button
               onClick={() => setActiveTab("NEET PG")}
-              className={`flex-1 px-4 sm:px-6 py-2 rounded-md text-sm font-medium transition-colors ${
+              className={`flex-1 px-4 sm:px-6 py-2 rounded-md text-sm transition-colors ${
                 activeTab === "NEET PG"
-                  ? "bg-gray-400 text-white shadow-sm"
-                  : "text-gray-600 hover:text-gray-900"
+                  ? "bg-[#dadada] text-gray-700 shadow-sm font-bold"
+                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-200"
               }`}
             >
               NEET PG
             </button>
             <button
               onClick={() => setActiveTab("NEET SS")}
-              className={`flex-1 px-4 sm:px-6 py-2 rounded-md text-sm font-medium transition-colors ${
+              className={`flex-1 px-4 sm:px-6 py-2 rounded-md text-sm transition-colors ${
                 activeTab === "NEET SS"
-                  ? "bg-gray-400 text-white shadow-sm"
-                  : "text-gray-600 hover:text-gray-900"
+                  ? "bg-[#dadada] text-gray-700 shadow-sm font-bold"
+                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-200"
               }`}
             >
               NEET SS
@@ -132,7 +132,7 @@ export default function Home() {
         {/* Form */}
         <form
           onSubmit={handleSubmit}
-          className="max-w-6xl mx-auto bg-white  border border-gray-400 p-4 rounded-3xl"
+          className="max-w-6xl mx-auto bg-white  border border-gray-100 p-4 rounded-3xl"
         >
           {/* Course Selection - Only show for NEET PG */}
           {activeTab === "NEET PG" && (
@@ -169,7 +169,7 @@ export default function Home() {
 
           {/* Form Fields - Single Horizontal Line */}
           <div className="flex flex-wrap items-center gap-1 mb-6">
-            <input  
+            <input
               type="text"
               placeholder="Name"
               value={formData.name}
@@ -193,7 +193,7 @@ export default function Home() {
               className="flex-1 min-w-[150px] px-3 py-2 bg-gray-lite border-gray-300 focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent"
             />
 
-            <input
+            {/* <input
               type="number"
               placeholder={
                 activeTab === "NEET PG"
@@ -203,6 +203,22 @@ export default function Home() {
               value={formData.rank}
               onChange={(e) => handleInputChange("rank", e.target.value)}
               className="flex-1 min-w-[150px] px-3 py-2 bg-gray-lite border-gray-300 focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent"
+            /> */}
+
+            <input
+              type="number"
+              placeholder={
+                activeTab === "NEET PG"
+                  ? "NEET PG 2024 Rank"
+                  : "NEET SS 2024 Rank"
+              }
+              value={formData.rank}
+              onChange={(e) => handleInputChange("rank", e.target.value)}
+              className="flex-1 min-w-[200px] px-3 py-2 bg-gray-lite border-gray-300 
+             focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent
+             [appearance:textfield] 
+             [&::-webkit-outer-spin-button]:appearance-none 
+             [&::-webkit-inner-spin-button]:appearance-none"
             />
 
             {activeTab === "NEET PG" ? (
@@ -281,7 +297,7 @@ export default function Home() {
             <div className="mb-6">
               <div className="flex items-center flex-wrap gap-x-6 gap-y-3">
                 <p className="text-sm font-bold text-gray-700">Category:</p>
-                
+
                 {[
                   "EWS",
                   "EWS PwD",
@@ -311,7 +327,6 @@ export default function Home() {
               </div>
             </div>
           )}
-
         </form>
       </main>
 

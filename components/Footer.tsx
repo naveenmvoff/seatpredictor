@@ -1,13 +1,24 @@
+import Image from "next/image";
+import Link from "next/link";
+
 export default function Footer() {
   return (
     <footer className="bg-gray-50 border-t border-gray-200 mt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-6">
           {/* Logo and QR Code Section */}
           <div className="lg:col-span-1">
             <div className="flex items-center mb-6">
-              <div className="bg-slate-800 text-white px-2 py-1 rounded text-sm font-bold mr-2">DOC</div>
-              <span className="text-gray-600 text-sm">TUTORIALS</span>
+              <Link href="/" className="flex items-center">
+                <Image
+                  className="h-16 w-auto"
+                  src="/assets/images/Logo Assets.png"
+                  alt="Logo"
+                  width={120}
+                  height={45}
+                  priority
+                />
+              </Link>
             </div>
           </div>
 
@@ -52,36 +63,46 @@ export default function Footer() {
               <p>help@doctutorials</p>
               <p>+91 7097434567 / +91 7097634567 (10 am - 7 pm)</p>
             </div>
+          </div>
 
+          <div className="lg:col-span-1">
             <div className="mb-4">
               <p className="text-gray-600 text-sm mb-2">Scan to download app</p>
-              <div className="w-16 h-16 bg-black rounded">
-                {/* QR Code placeholder */}
-                <div className="w-full h-full bg-black rounded flex items-center justify-center">
-                  <div className="grid grid-cols-3 gap-1">
-                    {[...Array(9)].map((_, i) => (
-                      <div key={i} className="w-1 h-1 bg-white rounded-sm"></div>
-                    ))}
-                  </div>
-                </div>
-              </div>
+
+              <Link href="/" className="flex items-center">
+                <Image
+                  // className="h-44 w-auto"
+                  className="w-[135.91px] h-[136.24px]"
+                  src="/assets/images/App-QR.png"
+                  alt="Logo"
+                  width={135.91}
+                  height={136.24}
+                  priority
+                />
+              </Link>
             </div>
 
             <div className="space-y-2">
-              <div className="bg-black text-white px-3 py-1 rounded text-xs flex items-center">
-                <span className="mr-2">📱</span>
-                <div>
-                  <div className="text-xs">Download on the</div>
-                  <div className="font-semibold">App Store</div>
-                </div>
-              </div>
-              <div className="bg-black text-white px-3 py-1 rounded text-xs flex items-center">
-                <span className="mr-2">▶️</span>
-                <div>
-                  <div className="text-xs">GET IT ON</div>
-                  <div className="font-semibold">Google Play</div>
-                </div>
-              </div>
+              <Link href="/" className="flex items-center">
+                <Image
+                  className="w-[135.91px] h-[40px]"
+                  src="/assets/images/App-Store.png"
+                  alt="Logo"
+                  width={135.91}
+                  height={40}
+                  priority
+                />
+              </Link>
+              <Link href="/" className="flex items-center">
+                <Image
+                  className="w-[135.91px] h-[40px]"
+                  src="/assets/images/Play-Store.png"
+                  alt="Logo"
+                  width={135.91}
+                  height={40}
+                  priority
+                />
+              </Link>
             </div>
           </div>
         </div>
@@ -89,25 +110,60 @@ export default function Footer() {
         {/* Bottom Section */}
         <div className="border-t border-gray-200 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
           <div className="flex space-x-4 mb-4 md:mb-0">
-            <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-              <span className="text-gray-600 text-sm">📷</span>
-            </div>
-            <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-              <span className="text-gray-600 text-sm">📺</span>
-            </div>
-            <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-              <span className="text-gray-600 text-sm">✈️</span>
-            </div>
-            <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-              <span className="text-gray-600 text-sm">💼</span>
-            </div>
-            <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-              <span className="text-gray-600 text-sm">👥</span>
-            </div>
+            <Link href="/" className="flex items-center">
+              <Image
+                className="w-[32px] h-[32px]"
+                src="/assets/images/social/Instagram.png"
+                alt="Logo"
+                width={32}
+                height={32}
+                priority
+              />
+            </Link>
+            <Link href="/" className="flex items-center">
+              <Image
+                className="w-[32px] h-[32px]"
+                src="/assets/images/social/Youtube.png"
+                alt="Logo"
+                width={32}
+                height={32}
+                priority
+              />
+            </Link>
+            <Link href="/" className="flex items-center">
+              <Image
+                className="w-[32px] h-[32px]"
+                src="/assets/images/social/Telegram.png"
+                alt="Logo"
+                width={32}
+                height={32}
+                priority
+              />
+            </Link>
+            <Link href="/" className="flex items-center">
+              <Image
+                className="w-[32px] h-[32px]"
+                src="/assets/images/social/LinkedIn.png"
+                alt="Logo"
+                width={32}
+                height={32}
+                priority
+              />
+            </Link>
+            <Link href="/" className="flex items-center">
+              <Image
+                className="w-[32px] h-[32px]"
+                src="/assets/images/social/Facebook.png"
+                alt="Logo"
+                width={32}
+                height={32}
+                priority
+              />
+            </Link>
           </div>
           <p className="text-gray-500 text-sm">© 2025 Doctutorials Edutech</p>
         </div>
       </div>
     </footer>
-  )
+  );
 }

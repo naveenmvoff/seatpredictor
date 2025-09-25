@@ -15,7 +15,7 @@ export default function Header() {
           <div className="flex items-center">
             <Link href="/" className="flex items-center">
               <Image 
-                className="h-8 w-auto" 
+                className="h-12 w-auto" 
                 src="/assets/images/Logo Assets.png" 
                 alt="Logo" 
                 width={120}

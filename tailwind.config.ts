@@ -11,6 +11,7 @@ const config: Config = {
       colors: {
         'gray-lite': 'var(--gray-lite)',
         'radio-blue': 'var(--radio-blue)',
+        'gray-dark': 'var(--gray-dark)',
       }
     }
   },

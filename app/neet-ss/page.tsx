@@ -236,7 +236,7 @@ export default function Results() {
             items={[
               { label: "Home", href: "/" },
               { label: "Seat Predictor", href: "/" },
-              { label: "NEET PG" },
+              { label: "NEET SS" },
             ]}
           />
         </div>
