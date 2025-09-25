@@ -48,6 +48,10 @@ export default function Results() {
     "M.D. (Pediatrics)", "M.D. (Radiology)", "M.D. (Dermatology)",
     "M.D. (Psychiatry)", "M.D. (Pathology)", "M.D. (Microbiology)"
   ];
+ 
+  const categoryOptions = [
+    "EWS", "EWS PwD", "OBC", "OBC PwD", "Open", "Open PwD", "SC", "SC PwD", "ST", "ST PwD"
+  ];
 
   const courseOptions = ["MD/MS", "DNB"];
 
@@ -206,6 +210,7 @@ export default function Results() {
   // Handle form input changes
   const handleInputChange = (field: keyof PredictorData, value: string) => {
     if (formData) {
+      console.log(field, value, "=======formdata=======", formData);
       setFormData({ ...formData, [field]: value });
     }
   };
@@ -385,8 +390,24 @@ export default function Results() {
                 onChange={(e) => handleInputChange('specialization', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-1 focus:ring-slate-700 focus:border-transparent"
               >
-                <option value="">All Specializations</option>
+                <option value="" disabled hidden >All Specializations</option>
                 {specializationOptions.map((spec) => (
+                  <option key={spec} value={spec}>{spec}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Category
+              </label>
+              <select
+                value={formData.category}
+                onChange={(e) => handleInputChange('specialization', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-1 focus:ring-slate-700 focus:border-transparent"
+              >
+                <option value="">Category</option>
+                {categoryOptions.map((spec) => (
                   <option key={spec} value={spec}>{spec}</option>
                 ))}
               </select>

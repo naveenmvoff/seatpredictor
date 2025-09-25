@@ -22,19 +22,34 @@ export default function Home() {
     qualifyingGroup: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmitNeetPG = (e: React.FormEvent) => {
     e.preventDefault();
-    // Store form data in sessionStorage for the results page
+    // Store form data in sessionStorage and redirect to NEET PG page
     sessionStorage.setItem(
-      "userData",
+      "predictorData",
       JSON.stringify({
         ...formData,
         course: selectedCourse,
         category: selectedCategory,
-        exam: activeTab,
+        exam: "NEET PG",
       })
     );
-    router.push("/results");
+    router.push("/neet-pg");
+  };
+
+  const handleSubmitNeetSS = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Store form data in sessionStorage and redirect to NEET SS page
+    sessionStorage.setItem(
+      "predictorData",
+      JSON.stringify({
+        ...formData,
+        course: "", // NEET SS doesn't have course selection
+        category: "", // NEET SS doesn't have category selection
+        exam: "NEET SS",
+      })
+    );
+    router.push("/neet-ss");
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -131,8 +146,8 @@ export default function Home() {
 
         {/* Form */}
         <form
-          onSubmit={handleSubmit}
-          className="max-w-6xl mx-auto bg-white  border border-gray-100 p-4 rounded-3xl"
+          onSubmit={activeTab === "NEET PG" ? handleSubmitNeetPG : handleSubmitNeetSS}
+          className="max-w-6xl mx-auto bg-white border border-gray-100 p-4 rounded-3xl"
         >
           {/* Course Selection - Only show for NEET PG */}
           {activeTab === "NEET PG" && (
@@ -192,18 +207,6 @@ export default function Home() {
               onChange={(e) => handleInputChange("email", e.target.value)}
               className="flex-1 min-w-[150px] px-3 py-2 bg-gray-lite border-gray-300 focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent"
             />
-
-            {/* <input
-              type="number"
-              placeholder={
-                activeTab === "NEET PG"
-                  ? "NEET PG 2024 Rank"
-                  : "NEET SS 2024 Rank"
-              }
-              value={formData.rank}
-              onChange={(e) => handleInputChange("rank", e.target.value)}
-              className="flex-1 min-w-[150px] px-3 py-2 bg-gray-lite border-gray-300 focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent"
-            /> */}
 
             <input
               type="number"
