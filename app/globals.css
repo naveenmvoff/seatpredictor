@@ -136,7 +136,7 @@
     color: var(--radio-blue) !important;
     /* -webkit-appearance: none; */
     appearance: none;
-    /* border: 1px solid #d1d5db; */
+    border: 1px solid #d1d5db;
     border-radius: 50%;
     /* background-color: white; */
     position: relative;

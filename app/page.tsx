@@ -231,7 +231,7 @@ export default function Home() {
                   onChange={(e) => handleInputChange("state", e.target.value)}
                   className="flex-1 min-w-[150px] px-3 py-2 bg-gray-lite border-gray-300 focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent"
                 >
-                  <option value="">State</option>
+                  <option value="" disabled>State</option>
                   <option value="Andhra Pradesh">Andhra Pradesh</option>
                   <option value="Delhi">Delhi</option>
                   <option value="Maharashtra">Maharashtra</option>
