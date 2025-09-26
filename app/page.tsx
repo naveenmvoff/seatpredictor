@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
@@ -21,6 +21,43 @@ export default function Home() {
     specialization: "",
     qualifyingGroup: "",
   });
+  const [showStateDropdown, setShowStateDropdown] = useState(false);
+  const [stateSearch, setStateSearch] = useState("");
+  const [showSpecializationDropdown, setShowSpecializationDropdown] =
+    useState(false);
+  const [specializationSearch, setSpecializationSearch] = useState("");
+
+  // Drop Down popup Close on outside click
+  const stateDropdownRef = useRef<HTMLDivElement>(null);
+  const specializationDropdownRef = useRef<HTMLDivElement>(null);
+
+  // State data in JSON format
+  const stateData = {
+    group: "State",
+    values: [
+      "Delhi",
+      "Maharashtra",
+      "Karnataka",
+      "Tamil Nadu",
+      "Telangana",
+      "Andhra Pradesh",
+      "Chandigarh",
+      "Puducherry",
+      "Gujarat",
+      "Rajasthan",
+    ],
+  };
+
+  const specializationData = {
+    group: "Specialization",
+    values: [
+      "M.D. (Anaesthesiology)",
+      "M.D. (General Medicine)",
+      "M.S. (General Surgery)",
+      "M.D. (Pediatrics)",
+      "M.D. (Radiology)",
+    ],
+  };
 
   const handleSubmitNeetPG = (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,6 +92,31 @@ export default function Home() {
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      const target = event.target as Node;
+
+      console.log("Clicked outside:", target);
+
+      if (
+        stateDropdownRef.current &&
+        !stateDropdownRef.current.contains(target)
+      ) {
+        setShowStateDropdown(false);
+      }
+      if (
+        specializationDropdownRef.current &&
+        !specializationDropdownRef.current.contains(target)
+      ) {
+        setShowSpecializationDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -146,7 +208,9 @@ export default function Home() {
 
         {/* Form */}
         <form
-          onSubmit={activeTab === "NEET PG" ? handleSubmitNeetPG : handleSubmitNeetSS}
+          onSubmit={
+            activeTab === "NEET PG" ? handleSubmitNeetPG : handleSubmitNeetSS
+          }
           className="max-w-6xl mx-auto bg-white border border-gray-100 p-4 rounded-3xl"
         >
           {/* Course Selection - Only show for NEET PG */}
@@ -226,42 +290,106 @@ export default function Home() {
 
             {activeTab === "NEET PG" ? (
               <>
-                <select
-                  value={formData.state}
-                  onChange={(e) => handleInputChange("state", e.target.value)}
-                  className="flex-1 min-w-[150px] px-3 py-2 bg-gray-lite border-gray-300 focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent"
+                {/* Searchable State Dropdown */}
+                <div
+                  ref={stateDropdownRef}
+                  className="relative flex-1 min-w-[150px]"
                 >
-                  <option value="" disabled>State</option>
-                  <option value="Andhra Pradesh">Andhra Pradesh</option>
-                  <option value="Delhi">Delhi</option>
-                  <option value="Maharashtra">Maharashtra</option>
-                  <option value="Tamil Nadu">Tamil Nadu</option>
-                  <option value="Karnataka">Karnataka</option>
-                  <option value="Telangana">Telangana</option>
-                  <option value="Chandigarh">Chandigarh</option>
-                  <option value="Puducherry">Puducherry</option>
-                </select>
+                  <div
+                    onClick={() => setShowStateDropdown((prev) => !prev)}
+                    className="px-3 py-2 bg-gray-lite border-gray-300 cursor-pointer text-sm focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent"
+                  >
+                    {formData.state || stateData.group}
+                  </div>
 
-                <select
-                  value={formData.specialization}
-                  onChange={(e) =>
-                    handleInputChange("specialization", e.target.value)
-                  }
-                  className="flex-1 min-w-[150px] px-3 py-2 bg-gray-lite border-gray-300 focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent"
+                  {showStateDropdown && (
+                    <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg z-10 max-h-60 overflow-y-auto">
+                      {/* Search bar */}
+                      <div className="p-2 border-b border-gray-200">
+                        <input
+                          type="text"
+                          value={stateSearch}
+                          onChange={(e) => setStateSearch(e.target.value)}
+                          placeholder="Search state..."
+                          className="w-full px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none"
+                        />
+                      </div>
+
+                      {/* Filtered state list */}
+                      {stateData.values
+                        .filter((state) =>
+                          state
+                            .toLowerCase()
+                            .includes(stateSearch.toLowerCase())
+                        )
+                        .map((state) => (
+                          <div
+                            key={state}
+                            onClick={() => {
+                              handleInputChange("state", state);
+                              setShowStateDropdown(false);
+                              setStateSearch("");
+                            }}
+                            className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer"
+                          >
+                            {state}
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                </div>
+
+                <div
+                  ref={specializationDropdownRef}
+                  className="relative flex-1 min-w-[150px]"
                 >
-                  <option value="">Specialization</option>
-                  <option value="M.D. (Anaesthesiology)">
-                    M.D. (Anaesthesiology)
-                  </option>
-                  <option value="M.D. (General Medicine)">
-                    M.D. (General Medicine)
-                  </option>
-                  <option value="M.S. (General Surgery)">
-                    M.S. (General Surgery)
-                  </option>
-                  <option value="M.D. (Pediatrics)">M.D. (Pediatrics)</option>
-                  <option value="M.D. (Radiology)">M.D. (Radiology)</option>
-                </select>
+                  <div
+                    onClick={() =>
+                      setShowSpecializationDropdown((prev) => !prev)
+                    }
+                    className="px-3 py-2 bg-gray-lite border-gray-300 rounded-md cursor-pointer text-sm focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent"
+                  >
+                    {formData.specialization || specializationData.group}
+                  </div>
+
+                  {showSpecializationDropdown && (
+                    <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg z-10 max-h-60 overflow-y-auto">
+                      {/* Search bar */}
+                      <div className="p-2 border-b border-gray-200">
+                        <input
+                          type="text"
+                          value={specializationSearch}
+                          onChange={(e) =>
+                            setSpecializationSearch(e.target.value)
+                          }
+                          placeholder="Search specialization..."
+                          className="w-full px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none"
+                        />
+                      </div>
+
+                      {/* Filtered specialization list */}
+                      {specializationData.values
+                        .filter((item) =>
+                          item
+                            .toLowerCase()
+                            .includes(specializationSearch.toLowerCase())
+                        )
+                        .map((item) => (
+                          <div
+                            key={item}
+                            onClick={() => {
+                              handleInputChange("specialization", item);
+                              setShowSpecializationDropdown(false);
+                              setSpecializationSearch("");
+                            }}
+                            className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer"
+                          >
+                            {item}
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                </div>
 
                 <button
                   type="submit"
