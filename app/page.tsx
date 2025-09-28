@@ -64,6 +64,16 @@ export default function Home() {
     values: specializationGroup?.category_type ?? [],
   };
 
+  // NEET SS dropdown list: all group_name except MD/MS and DNB
+  const ssGroupsData: LabeledValues = {
+    group: "Group",
+    values: dropdownData
+      .filter(
+        (g) => !["md/ms", "dnb"].includes((g.group_name || "").toLowerCase())
+      )
+      .map((g) => g.group_name),
+  };
+
   // If the selected specialization is not available for the new course, clear it
   useEffect(() => {
     if (
@@ -442,6 +452,8 @@ export default function Home() {
               </>
             ) : (
               <>
+
+              
                 <div
                   ref={stateDropdownRef}
                   className="relative flex-1 min-w-[150px]"
@@ -450,7 +462,7 @@ export default function Home() {
                     onClick={() => setShowStateDropdown((prev) => !prev)}
                     className="px-3 py-2 bg-gray-lite border-gray-300 cursor-pointer text-sm focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent"
                   >
-                    {formData.state || stateData.group}
+                    {formData.qualifyingGroup || ssGroupsData.group}
                   </div>
 
                   {showStateDropdown && (
@@ -461,29 +473,27 @@ export default function Home() {
                           type="text"
                           value={stateSearch}
                           onChange={(e) => setStateSearch(e.target.value)}
-                          placeholder="Search state..."
+                          placeholder="Search group..."
                           className="w-full px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none"
                         />
                       </div>
 
-                      {/* Filtered state list */}
-                      {stateData.values
-                        .filter((state) =>
-                          state
-                            .toLowerCase()
-                            .includes(stateSearch.toLowerCase())
+                      {/* Filtered group list */}
+                      {ssGroupsData.values
+                        .filter((name) =>
+                          name.toLowerCase().includes(stateSearch.toLowerCase())
                         )
-                        .map((state) => (
+                        .map((name) => (
                           <div
-                            key={state}
+                            key={name}
                             onClick={() => {
-                              handleInputChange("state", state);
+                              handleInputChange("qualifyingGroup", name);
                               setShowStateDropdown(false);
                               setStateSearch("");
                             }}
                             className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer"
                           >
-                            {state}
+                            {name}
                           </div>
                         ))}
                     </div>
