@@ -37,6 +37,11 @@ export default function Results() {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
+  // API result and payload handed off from the landing page
+  const [apiResult, setApiResult] = useState<any>(null);
+  console.log("API RESULT =======", apiResult);
+  const [apiForm, setApiForm] = useState<any>(null);
+
   // Available options for dropdowns
   const stateOptions = [
     "Delhi", "Maharashtra", "Karnataka", "Tamil Nadu", "Telangana", 
@@ -194,16 +199,26 @@ export default function Results() {
   };
 
   useEffect(() => {
-    // Get data from sessionStorage
+    // Get data from sessionStorage for legacy UI (filters)
     const storedData = sessionStorage.getItem("predictorData");
     if (storedData) {
       const data = JSON.parse(storedData);
       setPredictorData(data);
-      setFormData(data); // Initialize form data
+      setFormData(data); // Initialize form data for existing filters/table
       filterColleges(data);
     } else {
       // Redirect to home if no data
       router.push("/");
+    }
+
+    // Also read API payload/result handed off from landing page
+    const storedApiForm = sessionStorage.getItem("neetPgForm");
+    const storedApiResult = sessionStorage.getItem("neetPgResult");
+    if (storedApiForm) {
+      try { setApiForm(JSON.parse(storedApiForm)); } catch {}
+    }
+    if (storedApiResult) {
+      try { setApiResult(JSON.parse(storedApiResult)); } catch {}
     }
   }, [router]);
 
@@ -226,6 +241,11 @@ export default function Results() {
   const startIndex = (currentPage - 1) * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
   const currentColleges = filteredColleges.slice(startIndex, endIndex);
+
+  // Prefer API results for table when available
+  const apiRows: any[] | null = Array.isArray(apiResult?.filtered_results)
+    ? apiResult.filtered_results
+    : null;
 
   if (!userData || !formData) {
     return <div>Loading...</div>;
@@ -425,6 +445,16 @@ export default function Results() {
           </div>
         </div>
 
+        {/* API Result (from server) */}
+        {/* {apiResult && (
+          <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6 mb-6">
+            <h2 className="text-lg font-semibold mb-2">Server Result</h2>
+            <pre className="bg-gray-100 p-4 rounded overflow-x-auto text-sm">
+              {JSON.stringify(apiResult, null, 2)}
+            </pre>
+          </div>
+        )} */}
+
         {/* Results Table - Mobile Responsive */}
         <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
           {/* Mobile Card View */}
@@ -498,44 +528,64 @@ export default function Results() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {currentColleges.map((college, index) => (
-                  <tr key={college.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {startIndex + index + 1}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {college.rank.toLocaleString()}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">
-                      <div className="font-medium">{college.name}</div>
-                      <div className="text-gray-500 flex items-center mt-1">
-                        <svg
-                          className="w-4 h-4 mr-1"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                          />
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                          />
-                        </svg>
-                        {college.location}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {college.state}
-                    </td>
-                  </tr>
-                ))}
+                {apiRows
+                  ? apiRows.map((row, index) => (
+                      <tr
+                        key={`${row.allotted_institute}-${row.rank_no}-${index}`}
+                        className="hover:bg-gray-50"
+                      >
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {index + 1}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {Number(row.rank_no).toLocaleString()}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-900">
+                          <div className="font-medium">{row.allotted_institute}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {row.state}
+                        </td>
+                      </tr>
+                    ))
+                  : currentColleges.map((college, index) => (
+                      <tr key={college.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {startIndex + index + 1}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {college.rank.toLocaleString()}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-900">
+                          <div className="font-medium">{college.name}</div>
+                          <div className="text-gray-500 flex items-center mt-1">
+                            <svg
+                              className="w-4 h-4 mr-1"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                              />
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                              />
+                            </svg>
+                            {college.location}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {college.state}
+                        </td>
+                      </tr>
+                    ))}
               </tbody>
             </table>
           </div>

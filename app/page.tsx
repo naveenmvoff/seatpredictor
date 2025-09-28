@@ -122,7 +122,7 @@ export default function Home() {
     fetchGroupCategories();
   }, []);
 
-  const handleSubmitNeetPG = (e: React.FormEvent) => {
+  const handleSubmitNeetPG = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Build the API-ready payload for NEET PG
@@ -149,8 +149,25 @@ export default function Home() {
       exam: "NEET PG",
     };
 
-    sessionStorage.setItem("predictorData", JSON.stringify(predictorData));
-    router.push("/neet-pg");
+    try {
+      const res = await fetch("http://127.0.0.1:8000/api/allotment_tracker/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(NEET_PGData),
+      });
+
+      const result = await res.json();
+
+      // Store both the API result and the submitted payload for the next page
+      sessionStorage.setItem("neetPgResult", JSON.stringify(result));
+      sessionStorage.setItem("neetPgForm", JSON.stringify(NEET_PGData));
+    } catch (err) {
+      console.error("NEET_PG API error", err);
+    } finally {
+      // Preserve prior behavior for downstream usage
+      sessionStorage.setItem("predictorData", JSON.stringify(predictorData));
+      router.push("/neet-pg");
+    }
   };
 
   const handleSubmitNeetSS = (e: React.FormEvent) => {
