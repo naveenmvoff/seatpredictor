@@ -42,7 +42,7 @@ export default function Home() {
   const specializationDropdownRef = useRef<HTMLDivElement>(null);
 
   const [dropdownData, setDropdownData] = useState<GroupCategory[]>([]);
-  console.log("Fetched group categories:==========", dropdownData);
+  // console.log("Fetched group categories:==========", dropdownData);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -124,31 +124,39 @@ export default function Home() {
 
   const handleSubmitNeetPG = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Build the payload for NEET PG
+    const NEET_PGData = {
+      ...formData,
+      course: selectedCourse,
+      category: selectedCategory,
+      exam: "NEET PG",
+    };
+
+    // Log so it can be directly used as an API body
+    console.log("NEET_PG", NEET_PGData);
+
     // Store form data in sessionStorage and redirect to NEET PG page
-    sessionStorage.setItem(
-      "predictorData",
-      JSON.stringify({
-        ...formData,
-        course: selectedCourse,
-        category: selectedCategory,
-        exam: "NEET PG",
-      })
-    );
+    sessionStorage.setItem("predictorData", JSON.stringify(NEET_PGData));
     router.push("/neet-pg");
   };
 
   const handleSubmitNeetSS = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Build the payload for NEET SS
+    const NEET_SSDATA = {
+      ...formData,
+      course: "", // NEET SS doesn't have course selection
+      category: "", // NEET SS doesn't have category selection
+      exam: "NEET SS",
+    };
+
+    // Log so it can be directly used as an API body
+    console.log("NEET_SS", NEET_SSDATA);
+
     // Store form data in sessionStorage and redirect to NEET SS page
-    sessionStorage.setItem(
-      "predictorData",
-      JSON.stringify({
-        ...formData,
-        course: "", // NEET SS doesn't have course selection
-        category: "", // NEET SS doesn't have category selection
-        exam: "NEET SS",
-      })
-    );
+    sessionStorage.setItem("predictorData", JSON.stringify(NEET_SSDATA));
     router.push("/neet-ss");
   };
 
