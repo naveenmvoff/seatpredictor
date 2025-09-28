@@ -7,6 +7,11 @@ import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
 import Footer from "@/components/Footer";
 
+interface GroupCategory {
+  group_name: string;
+  category_type: string[];
+}
+
 export default function Home() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("NEET PG");
@@ -51,13 +56,43 @@ export default function Home() {
   const specializationData = {
     group: "Specialization",
     values: [
-      "M.D. (Anaesthesiology)",
+      "M.D. (Anaesthesiology) (Anaesthesiology and Critical Care)",
       "M.D. (General Medicine)",
       "M.S. (General Surgery)",
       "M.D. (Pediatrics)",
       "M.D. (Radiology)",
     ],
   };
+
+  const [data, setData] = useState<GroupCategory[]>([]);
+  console.log("Fetched group categories:==========", data);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+
+  useEffect(() => {
+    const fetchGroupCategories = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(
+          "http://127.0.0.1:8000/api/group-categories/"
+        );
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result: GroupCategory[] = await response.json();
+        setData(result);
+      } catch (err: any) {
+         setError(err.message || "Something went wrong");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGroupCategories();
+  }, []);
 
   const handleSubmitNeetPG = (e: React.FormEvent) => {
     e.preventDefault();
@@ -281,7 +316,7 @@ export default function Home() {
               }
               value={formData.rank}
               onChange={(e) => handleInputChange("rank", e.target.value)}
-              className="flex-1 min-w-[200px] px-3 py-2 bg-gray-lite border-gray-300 
+              className="flex-1 min-w-[170px] px-3 py-2 bg-gray-lite border-gray-300 
              focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent
              [appearance:textfield] 
              [&::-webkit-outer-spin-button]:appearance-none 
@@ -341,13 +376,16 @@ export default function Home() {
 
                 <div
                   ref={specializationDropdownRef}
-                  className="relative flex-1 min-w-[150px]"
+                  className="relative flex-1 min-w-[180px]"
                 >
                   <div
                     onClick={() =>
                       setShowSpecializationDropdown((prev) => !prev)
                     }
-                    className="px-3 py-2 bg-gray-lite border-gray-300 rounded-md cursor-pointer text-sm focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent"
+                    className="px-3 py-2 bg-gray-lite border-gray-300 cursor-pointer text-sm 
+             focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent 
+             whitespace-nowrap overflow-hidden truncate"
+                    title={formData.specialization || specializationData.group} // Tooltip with full value
                   >
                     {formData.specialization || specializationData.group}
                   </div>
@@ -382,7 +420,7 @@ export default function Home() {
                               setShowSpecializationDropdown(false);
                               setSpecializationSearch("");
                             }}
-                            className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer"
+                            className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer break-words"
                           >
                             {item}
                           </div>
