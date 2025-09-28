@@ -12,6 +12,11 @@ interface GroupCategory {
   category_type: string[];
 }
 
+interface LabeledValues {
+  group: string;
+  values: string[];
+}
+
 export default function Home() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("NEET PG");
@@ -36,18 +41,6 @@ export default function Home() {
   const stateDropdownRef = useRef<HTMLDivElement>(null);
   const specializationDropdownRef = useRef<HTMLDivElement>(null);
 
-
-  const specializationData = {
-    group: "Specialization",
-    values: [
-      "M.D. (Anaesthesiology) (Anaesthesiology and Critical Care)",
-      "M.D. (General Medicine)",
-      "M.S. (General Surgery)",
-      "M.D. (Pediatrics)",
-      "M.D. (Radiology)",
-    ],
-  };
-
   const [dropdownData, setDropdownData] = useState<GroupCategory[]>([]);
   console.log("Fetched group categories:==========", dropdownData);
   const [loading, setLoading] = useState<boolean>(true);
@@ -57,11 +50,29 @@ export default function Home() {
   const stateGroup = dropdownData.find(
     (g) => g.group_name?.toLowerCase() === "state"
   );
-  const stateData = {
+  const stateData: LabeledValues = {
     group: "State",
     values: stateGroup?.category_type ?? [],
   };
 
+  // Specialization data derived from dropdownData based on selectedCourse (MD/MS or DNB)
+  const specializationGroup = dropdownData.find(
+    (g) => g.group_name?.toLowerCase() === selectedCourse.toLowerCase()
+  );
+  const specializationData: LabeledValues = {
+    group: "Specialization",
+    values: specializationGroup?.category_type ?? [],
+  };
+
+  // If the selected specialization is not available for the new course, clear it
+  useEffect(() => {
+    if (
+      formData.specialization &&
+      !specializationData.values.includes(formData.specialization)
+    ) {
+      setFormData((prev) => ({ ...prev, specialization: "" }));
+    }
+  }, [selectedCourse, dropdownData]);
 
   useEffect(() => {
     const fetchGroupCategories = async () => {
@@ -78,7 +89,7 @@ export default function Home() {
         const result: GroupCategory[] = await response.json();
         setDropdownData(result);
       } catch (err: any) {
-         setError(err.message || "Something went wrong");
+        setError(err.message || "Something went wrong");
       } finally {
         setLoading(false);
       }
@@ -431,7 +442,110 @@ export default function Home() {
               </>
             ) : (
               <>
-                <select
+                <div
+                  ref={stateDropdownRef}
+                  className="relative flex-1 min-w-[150px]"
+                >
+                  <div
+                    onClick={() => setShowStateDropdown((prev) => !prev)}
+                    className="px-3 py-2 bg-gray-lite border-gray-300 cursor-pointer text-sm focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent"
+                  >
+                    {formData.state || stateData.group}
+                  </div>
+
+                  {showStateDropdown && (
+                    <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg z-10 max-h-60 overflow-y-auto">
+                      {/* Search bar */}
+                      <div className="p-2 border-b border-gray-200">
+                        <input
+                          type="text"
+                          value={stateSearch}
+                          onChange={(e) => setStateSearch(e.target.value)}
+                          placeholder="Search state..."
+                          className="w-full px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none"
+                        />
+                      </div>
+
+                      {/* Filtered state list */}
+                      {stateData.values
+                        .filter((state) =>
+                          state
+                            .toLowerCase()
+                            .includes(stateSearch.toLowerCase())
+                        )
+                        .map((state) => (
+                          <div
+                            key={state}
+                            onClick={() => {
+                              handleInputChange("state", state);
+                              setShowStateDropdown(false);
+                              setStateSearch("");
+                            }}
+                            className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer"
+                          >
+                            {state}
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                </div>
+
+                <div
+                  ref={specializationDropdownRef}
+                  className="relative flex-1 min-w-[180px]"
+                >
+                  <div
+                    onClick={() =>
+                      setShowSpecializationDropdown((prev) => !prev)
+                    }
+                    className="px-3 py-2 bg-gray-lite border-gray-300 cursor-pointer text-sm 
+             focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent 
+             whitespace-nowrap overflow-hidden truncate"
+                    title={formData.specialization || specializationData.group} // Tooltip with full value
+                  >
+                    {formData.specialization || specializationData.group}
+                  </div>
+
+                  {showSpecializationDropdown && (
+                    <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg z-10 max-h-60 overflow-y-auto">
+                      {/* Search bar */}
+                      <div className="p-2 border-b border-gray-200">
+                        <input
+                          type="text"
+                          value={specializationSearch}
+                          onChange={(e) =>
+                            setSpecializationSearch(e.target.value)
+                          }
+                          placeholder="Search specialization..."
+                          className="w-full px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none"
+                        />
+                      </div>
+
+                      {/* Filtered specialization list */}
+                      {specializationData.values
+                        .filter((item) =>
+                          item
+                            .toLowerCase()
+                            .includes(specializationSearch.toLowerCase())
+                        )
+                        .map((item) => (
+                          <div
+                            key={item}
+                            onClick={() => {
+                              handleInputChange("specialization", item);
+                              setShowSpecializationDropdown(false);
+                              setSpecializationSearch("");
+                            }}
+                            className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer break-words"
+                          >
+                            {item}
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* <select
                   value={formData.qualifyingGroup}
                   onChange={(e) =>
                     handleInputChange("qualifyingGroup", e.target.value)
@@ -442,7 +556,7 @@ export default function Home() {
                   <option value="Group A">Group A</option>
                   <option value="Group B">Group B</option>
                   <option value="Group C">Group C</option>
-                </select>
+                </select> */}
 
                 <button
                   type="submit"
