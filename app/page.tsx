@@ -162,7 +162,7 @@ export default function Home() {
       phone_number: formData.phone,
       email: formData.email,
       rank_no: Number(formData.rank),
-      state: formData.state,
+      state: "", // state not needed for NEET SS submissions
       allotment_category: "NEET_SS",
       qualifying_group_or_course: formData.qualifyingGroup,
       specialization: formData.specialization,
