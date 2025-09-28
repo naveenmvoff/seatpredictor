@@ -64,114 +64,26 @@ export default function Results() {
   const colleges: College[] = [
     {
       id: 1,
-      rank: 20000,
-      name: "All India Institute of Medical Sciences",
-      location: "Ansari Nagar, New Delhi, 110029",
-      state: "Delhi",
-      specialization: "M.D. (Anaesthesiology)",
-      course: "MD/MS",
-      category: "EWS",
+      rank: 2,
+      name: "",
+      location: "",
+      state: "",
+      specialization: "",
+      course: "",
+      category: "",
     },
-    {
-      id: 2,
-      rank: 30000,
-      name: "King Edward Memorial Hospital",
-      location: "Parel, Mumbai, Maharashtra, 400012",
-      state: "Maharashtra",
-      specialization: "M.D. (Anaesthesiology)",
-      course: "MD/MS",
-      category: "EWS",
-    },
-    {
-      id: 3,
-      rank: 40000,
-      name: "Postgraduate Institute of Medical Education and Research",
-      location: "Sector 12, Chandigarh, 160012",
-      state: "Chandigarh",
-      specialization: "M.D. (Anaesthesiology)",
-      course: "MD/MS",
-      category: "EWS",
-    },
-    {
-      id: 4,
-      rank: 50000,
-      name: "Jawaharlal Institute of Postgraduate Medical Education and Research",
-      location: "Dhanvantari Nagar, Puducherry, 605006",
-      state: "Puducherry",
-      specialization: "M.D. (Anaesthesiology)",
-      course: "MD/MS",
-      category: "EWS",
-    },
-    {
-      id: 5,
-      rank: 60000,
-      name: "Nizam's Institute of Medical Sciences",
-      location: "Punjagutta, Hyderabad, Telangana, 500082",
-      state: "Telangana",
-      specialization: "M.D. (Anaesthesiology)",
-      course: "MD/MS",
-      category: "EWS",
-    },
-    {
-      id: 6,
-      rank: 70000,
-      name: "Christian Medical College",
-      location: "Vellore, Tamil Nadu, 632004",
-      state: "Tamil Nadu",
-      specialization: "M.D. (Anaesthesiology)",
-      course: "MD/MS",
-      category: "EWS",
-    },
-    {
-      id: 7,
-      rank: 80000,
-      name: "Tata Memorial Hospital",
-      location: "Parel, Mumbai, Maharashtra, 400012",
-      state: "Maharashtra",
-      specialization: "M.D. (Anaesthesiology)",
-      course: "MD/MS",
-      category: "EWS",
-    },
-    {
-      id: 8,
-      rank: 90000,
-      name: "Lady Hardinge Medical College",
-      location: "Connaught Place, New Delhi, 110001",
-      state: "Delhi",
-      specialization: "M.D. (Anaesthesiology)",
-      course: "MD/MS",
-      category: "EWS",
-    },
-    {
-      id: 9,
-      rank: 100000,
-      name: "Sri Ramachandra Medical College",
-      location: "Porur, Chennai, Tamil Nadu, 600116",
-      state: "Tamil Nadu",
-      specialization: "M.D. (Anaesthesiology)",
-      course: "MD/MS",
-      category: "EWS",
-    },
-    {
-      id: 10,
-      rank: 110000,
-      name: "Kasturba Medical College",
-      location: "Manipal, Karnataka, 576104",
-      state: "Karnataka",
-      specialization: "M.D. (Anaesthesiology)",
-      course: "MD/MS",
-      category: "EWS",
-    },
-    {
-      id: 11,
-      rank: 120000,
-      name: "B.J. Medical College",
-      location: "Sangamner Road, Pune, Maharashtra, 411001",
-      state: "Maharashtra",
-      specialization: "M.D. (Anaesthesiology)",
-      course: "MD/MS",
-      category: "EWS",
-    },
+    
+    // {
+    //   id: 1,
+    //   rank: 20000,
+    //   name: "All India Institute of Medical Sciences",
+    //   location: "Ansari Nagar, New Delhi, 110029",
+    //   state: "Delhi",
+    //   specialization: "M.D. (Anaesthesiology)",
+    //   course: "MD/MS",
+    //   category: "EWS",
+    // },
+
   ];
 
   // Filter colleges function
@@ -525,6 +437,9 @@ export default function Results() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     State ↑
                   </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Category ↑
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -545,6 +460,9 @@ export default function Results() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {row.state}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {row.candidate_category}
                         </td>
                       </tr>
                     ))
@@ -583,6 +501,9 @@ export default function Results() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {college.state}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {college.category}
                         </td>
                       </tr>
                     ))}
