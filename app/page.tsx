@@ -59,10 +59,6 @@ export default function Home() {
   const specializationGroup = dropdownData.find(
     (g) => g.group_name?.toLowerCase() === selectedCourse.toLowerCase()
   );
-  const specializationData: LabeledValues = {
-    group: "Specialization",
-    values: specializationGroup?.category_type ?? [],
-  };
 
   // NEET SS dropdown list: all group_name except MD/MS and DNB
   const ssGroupsData: LabeledValues = {
@@ -74,7 +70,25 @@ export default function Home() {
       .map((g) => g.group_name),
   };
 
-  // If the selected specialization is not available for the new course, clear it
+  // NEET SS specialization options based on selected group (qualifyingGroup)
+  const ssSpecializationGroup = dropdownData.find(
+    (g) => g.group_name === formData.qualifyingGroup
+  );
+  const ssSpecializationData: LabeledValues = {
+    group: "Specialization",
+    values: ssSpecializationGroup?.category_type ?? [],
+  };
+
+  // Unify specialization data depending on active tab
+  const specializationData: LabeledValues =
+    activeTab === "NEET PG"
+      ? {
+          group: "Specialization",
+          values: specializationGroup?.category_type ?? [],
+        }
+      : ssSpecializationData;
+
+  // If the selected specialization is not available for the current context, clear it
   useEffect(() => {
     if (
       formData.specialization &&
@@ -82,7 +96,7 @@ export default function Home() {
     ) {
       setFormData((prev) => ({ ...prev, specialization: "" }));
     }
-  }, [selectedCourse, dropdownData]);
+  }, [selectedCourse, formData.qualifyingGroup, dropdownData, activeTab]);
 
   useEffect(() => {
     const fetchGroupCategories = async () => {
@@ -452,8 +466,6 @@ export default function Home() {
               </>
             ) : (
               <>
-
-              
                 <div
                   ref={stateDropdownRef}
                   className="relative flex-1 min-w-[150px]"
