@@ -156,19 +156,31 @@ export default function Home() {
   const handleSubmitNeetSS = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Build the payload for NEET SS
+    // Build the API-ready payload for NEET SS
     const NEET_SSDATA = {
+      name: formData.name,
+      phone_number: formData.phone,
+      email: formData.email,
+      rank_no: Number(formData.rank),
+      state: formData.state,
+      allotment_category: "NEET_SS",
+      qualifying_group_or_course: formData.qualifyingGroup,
+      specialization: formData.specialization,
+      category: "",
+    };
+
+    // Log so it can be directly used as an API body
+    console.log("NEET_SS", NEET_SSDATA);
+
+    // Keep storing the original structure for the next page (if needed)
+    const predictorData = {
       ...formData,
       course: "", // NEET SS doesn't have course selection
       category: "", // NEET SS doesn't have category selection
       exam: "NEET SS",
     };
 
-    // Log so it can be directly used as an API body
-    console.log("NEET_SS", NEET_SSDATA);
-
-    // Store form data in sessionStorage and redirect to NEET SS page
-    sessionStorage.setItem("predictorData", JSON.stringify(NEET_SSDATA));
+    sessionStorage.setItem("predictorData", JSON.stringify(predictorData));
     router.push("/neet-ss");
   };
 
