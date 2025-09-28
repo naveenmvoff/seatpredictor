@@ -170,7 +170,7 @@ export default function Home() {
     }
   };
 
-  const handleSubmitNeetSS = (e: React.FormEvent) => {
+  const handleSubmitNeetSS = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Build the API-ready payload for NEET SS
@@ -197,8 +197,25 @@ export default function Home() {
       exam: "NEET SS",
     };
 
-    sessionStorage.setItem("predictorData", JSON.stringify(predictorData));
-    router.push("/neet-ss");
+    try {
+      const res = await fetch("http://127.0.0.1:8000/api/allotment_tracker/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(NEET_SSDATA),
+      });
+
+      const result = await res.json();
+
+      // Store both the API result and the submitted payload for the next page
+      sessionStorage.setItem("neetSsResult", JSON.stringify(result));
+      sessionStorage.setItem("neetSsForm", JSON.stringify(NEET_SSDATA));
+    } catch (err) {
+      console.error("NEET_SS API error", err);
+    } finally {
+      // Preserve prior behavior for downstream usage
+      sessionStorage.setItem("predictorData", JSON.stringify(predictorData));
+      router.push("/neet-ss");
+    }
   };
 
   const handleInputChange = (field: string, value: string) => {

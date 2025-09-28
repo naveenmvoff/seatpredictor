@@ -41,6 +41,7 @@ export default function Results() {
   const [apiResult, setApiResult] = useState<any>(null);
   console.log("API RESULT =======", apiResult);
   const [apiForm, setApiForm] = useState<any>(null);
+  const [apiLoading, setApiLoading] = useState<boolean>(false);
 
   // Available options for dropdowns
   const stateOptions = [
@@ -142,11 +143,45 @@ export default function Results() {
     }
   };
 
-  // Handle update button click
-  const handleUpdateFilters = () => {
-    if (formData) {
-      filterColleges(formData);
+  // Handle update button click - call API and update server-side results
+  const handleUpdateFilters = async () => {
+    if (!formData) return;
+
+    setApiLoading(true);
+
+    // Build API payload from current formData
+    const payload = {
+      name: formData.name,
+      phone_number: (formData as any).phone, // from landing page state
+      email: formData.email,
+      rank_no: Number(formData.rank),
+      state: formData.state,
+      allotment_category: "NEET_PG",
+      qualifying_group_or_course: formData.course,
+      specialization: formData.specialization,
+      category: formData.category,
+    };
+
+    try {
+      const res = await fetch("http://127.0.0.1:8000/api/allotment_tracker/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      setApiResult(data);
+
+      // persist for refresh / navigation parity
+      sessionStorage.setItem("neetPgResult", JSON.stringify(data));
+      sessionStorage.setItem("neetPgForm", JSON.stringify(payload));
+    } catch (err) {
+      console.error("NEET_PG API error (update)", err);
+    } finally {
+      setApiLoading(false);
     }
+
+    // Keep local filter behavior too (optional)
+    filterColleges(formData);
   };
 
   const totalPages = Math.ceil(filteredColleges.length / rowsPerPage);
@@ -349,9 +384,10 @@ export default function Results() {
             <div className="flex items-end">
               <button 
                 onClick={handleUpdateFilters}
-                className="w-full bg-slate-700 hover:bg-slate-800 text-white px-6 py-2 rounded-md font-medium transition-colors"
+                disabled={apiLoading}
+                className="w-full bg-slate-700 hover:bg-slate-800 text-white px-6 py-2 rounded-md font-medium transition-colors disabled:opacity-60"
               >
-                Update
+                {apiLoading ? "Fetching..." : "Update"}
               </button>
             </div>
           </div>
