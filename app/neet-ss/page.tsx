@@ -36,6 +36,7 @@ export default function Results() {
   const [filteredColleges, setFilteredColleges] = useState<College[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [apiResult, setApiResult] = useState<any>(null);
 
   // Available options for dropdowns
   const stateOptions = [
@@ -201,6 +202,12 @@ export default function Results() {
       // Redirect to home if no data
       router.push("/");
     }
+
+    // Read API result passed from landing page
+    const storedApiResult = sessionStorage.getItem("neetSsResult");
+    if (storedApiResult) {
+      try { setApiResult(JSON.parse(storedApiResult)); } catch {}
+    }
   }, [router]);
 
   // Handle form input changes
@@ -221,6 +228,11 @@ export default function Results() {
   const startIndex = (currentPage - 1) * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
   const currentColleges = filteredColleges.slice(startIndex, endIndex);
+
+  // Prefer API results for table when available
+  const apiRows: any[] | null = Array.isArray(apiResult?.filtered_results)
+    ? apiResult.filtered_results
+    : null;
 
   if (!userData || !formData) {
     return <div>Loading...</div>;
@@ -470,50 +482,46 @@ export default function Results() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     College ↑
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     State ↑
-                  </th>
+                  </th> */}
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {currentColleges.map((college, index) => (
-                  <tr key={college.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {startIndex + index + 1}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {college.rank.toLocaleString()}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">
-                      <div className="font-medium">{college.name}</div>
-                      <div className="text-gray-500 flex items-center mt-1">
-                        <svg
-                          className="w-4 h-4 mr-1"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                          />
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                          />
-                        </svg>
-                        {college.location}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {college.state}
-                    </td>
-                  </tr>
-                ))}
+                {apiRows
+                  ? apiRows.map((row, index) => (
+                      <tr key={`ss-${row.allotted_institute}-${row.rank_no}-${index}`} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {index + 1}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {Number(row.rank_no).toLocaleString()}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-900">
+                          <div className="font-medium">{row.allotted_institute}</div>
+                        </td>
+                      </tr>
+                    ))
+                  : currentColleges.map((college, index) => (
+                      <tr key={college.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {startIndex + index + 1}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {college.rank.toLocaleString()}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-900">
+                          <div className="font-medium">{college.name}</div>
+                          <div className="text-gray-500 flex items-center mt-1">
+                            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            {college.location}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
               </tbody>
             </table>
           </div>
