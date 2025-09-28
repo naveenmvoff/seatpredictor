@@ -36,22 +36,6 @@ export default function Home() {
   const stateDropdownRef = useRef<HTMLDivElement>(null);
   const specializationDropdownRef = useRef<HTMLDivElement>(null);
 
-  // State data in JSON format
-  const stateData = {
-    group: "State",
-    values: [
-      "Delhi",
-      "Maharashtra",
-      "Karnataka",
-      "Tamil Nadu",
-      "Telangana",
-      "Andhra Pradesh",
-      "Chandigarh",
-      "Puducherry",
-      "Gujarat",
-      "Rajasthan",
-    ],
-  };
 
   const specializationData = {
     group: "Specialization",
@@ -64,10 +48,19 @@ export default function Home() {
     ],
   };
 
-  const [data, setData] = useState<GroupCategory[]>([]);
-  console.log("Fetched group categories:==========", data);
+  const [dropdownData, setDropdownData] = useState<GroupCategory[]>([]);
+  console.log("Fetched group categories:==========", dropdownData);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  // State data derived from dropdownData (group_name: "state")
+  const stateGroup = dropdownData.find(
+    (g) => g.group_name?.toLowerCase() === "state"
+  );
+  const stateData = {
+    group: "State",
+    values: stateGroup?.category_type ?? [],
+  };
 
 
   useEffect(() => {
@@ -83,7 +76,7 @@ export default function Home() {
         }
 
         const result: GroupCategory[] = await response.json();
-        setData(result);
+        setDropdownData(result);
       } catch (err: any) {
          setError(err.message || "Something went wrong");
       } finally {
