@@ -125,19 +125,31 @@ export default function Home() {
   const handleSubmitNeetPG = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Build the payload for NEET PG
+    // Build the API-ready payload for NEET PG
     const NEET_PGData = {
+      name: formData.name,
+      phone_number: formData.phone,
+      email: formData.email,
+      rank_no: Number(formData.rank),
+      state: formData.state,
+      allotment_category: "NEET_PG",
+      qualifying_group_or_course: selectedCourse,
+      specialization: formData.specialization,
+      category: selectedCategory,
+    };
+
+    // Log so it can be directly used as an API body
+    console.log("NEET_PG", NEET_PGData);
+
+    // Keep storing the original structure for the next page (if needed)
+    const predictorData = {
       ...formData,
       course: selectedCourse,
       category: selectedCategory,
       exam: "NEET PG",
     };
 
-    // Log so it can be directly used as an API body
-    console.log("NEET_PG", NEET_PGData);
-
-    // Store form data in sessionStorage and redirect to NEET PG page
-    sessionStorage.setItem("predictorData", JSON.stringify(NEET_PGData));
+    sessionStorage.setItem("predictorData", JSON.stringify(predictorData));
     router.push("/neet-pg");
   };
 
