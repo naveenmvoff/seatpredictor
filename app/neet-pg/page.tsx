@@ -73,6 +73,10 @@ export default function Results() {
     useState(false);
   const [specializationSearch, setSpecializationSearch] = useState("");
 
+  const categoryDropdownRef = useRef<HTMLDivElement>(null);
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  const [categorySearch, setCategorySearch] = useState("");
+
   useEffect(() => {
     const fetchGroupCategories = async () => {
       try {
@@ -108,7 +112,8 @@ export default function Results() {
 
   // Specialization options based on selected course (MD/MS or DNB)
   const specializationGroup = dropdownData.find(
-    (g) => g.group_name?.toLowerCase() === (formData?.course || "").toLowerCase()
+    (g) =>
+      g.group_name?.toLowerCase() === (formData?.course || "").toLowerCase()
   );
   const specializationData: LabeledValues = {
     group: "Specialization",
@@ -209,10 +214,16 @@ export default function Results() {
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       const target = event.target as Node;
-      if (stateDropdownRef.current && !stateDropdownRef.current.contains(target)) {
+      if (
+        stateDropdownRef.current &&
+        !stateDropdownRef.current.contains(target)
+      ) {
         setShowStateDropdown(false);
       }
-      if (courseDropdownRef.current && !courseDropdownRef.current.contains(target)) {
+      if (
+        courseDropdownRef.current &&
+        !courseDropdownRef.current.contains(target)
+      ) {
         setShowCourseDropdown(false);
       }
       if (
@@ -220,6 +231,12 @@ export default function Results() {
         !specializationDropdownRef.current.contains(target)
       ) {
         setShowSpecializationDropdown(false);
+      }
+      if (
+        categoryDropdownRef.current &&
+        !categoryDropdownRef.current.contains(target)
+      ) {
+        setShowCategoryDropdown(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -469,19 +486,11 @@ export default function Results() {
 
                 {showCourseDropdown && (
                   <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg z-10 max-h-60 overflow-y-auto">
-                    <div className="p-2 border-b border-gray-200">
-                      <input
-                        type="text"
-                        value={courseSearch}
-                        onChange={(e) => setCourseSearch(e.target.value)}
-                        placeholder="Search course..."
-                        className="w-full px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none"
-                      />
-                    </div>
-
                     {courseOptions
                       .filter((course) =>
-                        course.toLowerCase().includes(courseSearch.toLowerCase())
+                        course
+                          .toLowerCase()
+                          .includes(courseSearch.toLowerCase())
                       )
                       .map((course) => (
                         <div
@@ -520,7 +529,9 @@ export default function Results() {
                       <input
                         type="text"
                         value={specializationSearch}
-                        onChange={(e) => setSpecializationSearch(e.target.value)}
+                        onChange={(e) =>
+                          setSpecializationSearch(e.target.value)
+                        }
                         placeholder="Search specialization..."
                         className="w-full px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none"
                       />
@@ -554,20 +565,36 @@ export default function Results() {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Category
               </label>
-              <select
-                value={formData.category}
-                onChange={(e) => handleInputChange("category", e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-1 focus:ring-slate-700 focus:border-transparent"
-              >
-                <option value="" disabled>
-                  All Categories
-                </option>
-                {categoryOptions.map((category) => (
-                  <option key={category} value={category}>
-                    {category}
-                  </option>
-                ))}
-              </select>
+              <div ref={categoryDropdownRef} className="relative w-full">
+                <div
+                  onClick={() => setShowCategoryDropdown((prev) => !prev)}
+                  className="px-3 py-2 bg-white border border-gray-300 rounded-md cursor-pointer text-sm focus:outline-none focus:ring-1 focus:ring-slate-700 focus:border-transparent"
+                >
+                  {formData.category || "All Categories"}
+                </div>
+
+                {showCategoryDropdown && (
+                  <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg z-10 max-h-60 overflow-y-auto">
+                    {categoryOptions
+                      .filter((c) =>
+                        c.toLowerCase().includes(categorySearch.toLowerCase())
+                      )
+                      .map((c) => (
+                        <div
+                          key={c}
+                          onClick={() => {
+                            handleInputChange("category", c);
+                            setShowCategoryDropdown(false);
+                            setCategorySearch("");
+                          }}
+                          className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer"
+                        >
+                          {c}
+                        </div>
+                      ))}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="flex items-end">
@@ -576,7 +603,7 @@ export default function Results() {
                 disabled={apiLoading}
                 className="w-full bg-slate-700 hover:bg-slate-800 text-white px-6 py-2 rounded-md font-medium transition-colors disabled:opacity-60"
               >
-                {apiLoading ? "Fetching..." : "Update"}
+                {apiLoading ? "Please wait..." : "Update"}
               </button>
             </div>
           </div>

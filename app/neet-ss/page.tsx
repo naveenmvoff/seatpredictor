@@ -29,6 +29,16 @@ interface PredictorData {
   exam: string;
 }
 
+interface GroupCategory {
+  group_name: string;
+  category_type: string[];
+}
+
+interface LabeledValues {
+  group: string;
+  values: string[];
+}
+
 export default function Results() {
   const router = useRouter();
   const [userData, setPredictorData] = useState<PredictorData | null>(null);
@@ -38,16 +48,59 @@ export default function Results() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [apiResult, setApiResult] = useState<any>(null);
 
+  const [dropdownData, setDropdownData] = useState<GroupCategory[]>([]);
+  console.log("Fetched group categories:==========", dropdownData);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchGroupCategories = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(
+          "http://127.0.0.1:8000/api/group-categories/"
+        );
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result: GroupCategory[] = await response.json();
+        setDropdownData(result);
+      } catch (err: any) {
+        setError(err.message || "Something went wrong");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGroupCategories();
+  }, []);
+
   // Available options for dropdowns
   const stateOptions = [
-    "Delhi", "Maharashtra", "Karnataka", "Tamil Nadu", "Telangana", 
-    "Andhra Pradesh", "Chandigarh", "Puducherry", "Gujarat", "Rajasthan"
+    "Delhi",
+    "Maharashtra",
+    "Karnataka",
+    "Tamil Nadu",
+    "Telangana",
+    "Andhra Pradesh",
+    "Chandigarh",
+    "Puducherry",
+    "Gujarat",
+    "Rajasthan",
   ];
 
   const specializationOptions = [
-    "M.D. (Anaesthesiology)", "M.D. (General Medicine)", "M.S. (General Surgery)",
-    "M.D. (Pediatrics)", "M.D. (Radiology)", "M.D. (Dermatology)",
-    "M.D. (Psychiatry)", "M.D. (Pathology)", "M.D. (Microbiology)"
+    "M.D. (Anaesthesiology)",
+    "M.D. (General Medicine)",
+    "M.S. (General Surgery)",
+    "M.D. (Pediatrics)",
+    "M.D. (Radiology)",
+    "M.D. (Dermatology)",
+    "M.D. (Psychiatry)",
+    "M.D. (Pathology)",
+    "M.D. (Microbiology)",
   ];
 
   const courseOptions = ["MD/MS", "DNB"];
@@ -173,8 +226,7 @@ export default function Results() {
       const matchesRank = college.rank >= userRank;
       const matchesState = !data.state || college.state === data.state;
       const matchesSpecialization =
-        !data.specialization ||
-        college.specialization === data.specialization;
+        !data.specialization || college.specialization === data.specialization;
       const matchesCourse = college.course === data.course;
       const matchesCategory = college.category === data.category;
 
@@ -206,7 +258,9 @@ export default function Results() {
     // Read API result passed from landing page
     const storedApiResult = sessionStorage.getItem("neetSsResult");
     if (storedApiResult) {
-      try { setApiResult(JSON.parse(storedApiResult)); } catch {}
+      try {
+        setApiResult(JSON.parse(storedApiResult));
+      } catch {}
     }
   }, [router]);
 
@@ -306,21 +360,20 @@ export default function Results() {
 
             <div className="hidden lg:flex flex-row items-center bg-white border border-gray-200 rounded-lg px-4 py-2 ">
               <div className="flex flex-col items-start">
-              <div>
-                <span className="text-sm font-medium text-gray-700 mr-2">
-                  Personal details
-                </span>
-              </div>
-              <div className="text-xs text-gray-500 flex items-center">
-                <span>{userData.name || "Rajesh Das"}</span>
-                <span className="mx-1">•</span>
-                <span>+91 XXXXXXX</span>
-                <span className="mx-1">•</span>
-                <span>{userData.email || "rajesh@example.com"}</span>
-                <span className="mx-1">•</span>
-                <span>{userData.category} Category</span>
-                
-              </div>
+                <div>
+                  <span className="text-sm font-medium text-gray-700 mr-2">
+                    Personal details
+                  </span>
+                </div>
+                <div className="text-xs text-gray-500 flex items-center">
+                  <span>{userData.name || "Rajesh Das"}</span>
+                  <span className="mx-1">•</span>
+                  <span>+91 XXXXXXX</span>
+                  <span className="mx-1">•</span>
+                  <span>{userData.email || "rajesh@example.com"}</span>
+                  <span className="mx-1">•</span>
+                  <span>{userData.category} Category</span>
+                </div>
               </div>
               <button className="ml-2 text-radio-blue hover:text-slate-800">
                 <svg
@@ -337,7 +390,6 @@ export default function Results() {
                   />
                 </svg>
               </button>
-              
             </div>
           </div>
         </div>
@@ -347,43 +399,31 @@ export default function Results() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                {userData.exam === "NEET PG" ? "NEET PG 2024 Rank" : "NEET SS 2024 Rank"}
+                {userData.exam === "NEET PG"
+                  ? "NEET PG 2024 Rank"
+                  : "NEET SS 2024 Rank"}
               </label>
               <input
                 type="number"
                 value={formData.rank}
-                onChange={(e) => handleInputChange('rank', e.target.value)}
+                onChange={(e) => handleInputChange("rank", e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-1 focus:ring-slate-700 focus:border-transparent"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                State
-              </label>
-              <select
-                value={formData.state}
-                onChange={(e) => handleInputChange('state', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-1 focus:ring-slate-700 focus:border-transparent"
-              >
-                <option value="">All States</option>
-                {stateOptions.map((state) => (
-                  <option key={state} value={state}>{state}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Course
+                Qualifying Group
               </label>
               <select
                 value={formData.course}
-                onChange={(e) => handleInputChange('course', e.target.value)}
+                onChange={(e) => handleInputChange("course", e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-1 focus:ring-slate-700 focus:border-transparent"
               >
                 {courseOptions.map((course) => (
-                  <option key={course} value={course}>{course}</option>
+                  <option key={course} value={course}>
+                    {course}
+                  </option>
                 ))}
               </select>
             </div>
@@ -394,18 +434,22 @@ export default function Results() {
               </label>
               <select
                 value={formData.specialization}
-                onChange={(e) => handleInputChange('specialization', e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("specialization", e.target.value)
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-1 focus:ring-slate-700 focus:border-transparent"
               >
                 <option value="">All Specializations</option>
                 {specializationOptions.map((spec) => (
-                  <option key={spec} value={spec}>{spec}</option>
+                  <option key={spec} value={spec}>
+                    {spec}
+                  </option>
                 ))}
               </select>
             </div>
 
             <div className="flex items-end">
-              <button 
+              <button
                 onClick={handleUpdateFilters}
                 className="w-full bg-slate-700 hover:bg-slate-800 text-white px-6 py-2 rounded-md font-medium transition-colors"
               >
@@ -482,15 +526,15 @@ export default function Results() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     College ↑
                   </th>
-                  {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    State ↑
-                  </th> */}
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {apiRows
                   ? apiRows.map((row, index) => (
-                      <tr key={`ss-${row.allotted_institute}-${row.rank_no}-${index}`} className="hover:bg-gray-50">
+                      <tr
+                        key={`ss-${row.allotted_institute}-${row.rank_no}-${index}`}
+                        className="hover:bg-gray-50"
+                      >
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {index + 1}
                         </td>
@@ -498,7 +542,9 @@ export default function Results() {
                           {Number(row.rank_no).toLocaleString()}
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-900">
-                          <div className="font-medium">{row.allotted_institute}</div>
+                          <div className="font-medium">
+                            {row.allotted_institute}
+                          </div>
                         </td>
                       </tr>
                     ))
@@ -513,9 +559,24 @@ export default function Results() {
                         <td className="px-6 py-4 text-sm text-gray-900">
                           <div className="font-medium">{college.name}</div>
                           <div className="text-gray-500 flex items-center mt-1">
-                            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <svg
+                              className="w-4 h-4 mr-1"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                              />
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                              />
                             </svg>
                             {college.location}
                           </div>
