@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
@@ -57,6 +57,21 @@ export default function Results() {
   console.log("Fetched group categories:==========", dropdownData);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Searchable dropdown refs and state
+  const stateDropdownRef = useRef<HTMLDivElement>(null);
+  const courseDropdownRef = useRef<HTMLDivElement>(null);
+  const specializationDropdownRef = useRef<HTMLDivElement>(null);
+
+  const [showStateDropdown, setShowStateDropdown] = useState(false);
+  const [stateSearch, setStateSearch] = useState("");
+
+  const [showCourseDropdown, setShowCourseDropdown] = useState(false);
+  const [courseSearch, setCourseSearch] = useState("");
+
+  const [showSpecializationDropdown, setShowSpecializationDropdown] =
+    useState(false);
+  const [specializationSearch, setSpecializationSearch] = useState("");
 
   useEffect(() => {
     const fetchGroupCategories = async () => {
@@ -189,6 +204,29 @@ export default function Results() {
       } catch {}
     }
   }, [router]);
+
+  // Close dropdowns on outside click
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      const target = event.target as Node;
+      if (stateDropdownRef.current && !stateDropdownRef.current.contains(target)) {
+        setShowStateDropdown(false);
+      }
+      if (courseDropdownRef.current && !courseDropdownRef.current.contains(target)) {
+        setShowCourseDropdown(false);
+      }
+      if (
+        specializationDropdownRef.current &&
+        !specializationDropdownRef.current.contains(target)
+      ) {
+        setShowSpecializationDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // Handle form input changes
   const handleInputChange = (field: keyof PredictorData, value: string) => {
@@ -375,62 +413,141 @@ export default function Results() {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 State
               </label>
-              <select
-                value={formData.state}
-                onChange={(e) => handleInputChange("state", e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-1 focus:ring-slate-700 focus:border-transparent"
-              >
-                <option value="" disabled>
-                  All States
-                </option>
-                {stateData.values.map((state) => (
-                  <option key={state} value={state}>
-                    {state}
-                  </option>
-                ))}
-              </select>
+              <div ref={stateDropdownRef} className="relative w-full">
+                <div
+                  onClick={() => setShowStateDropdown((prev) => !prev)}
+                  className="px-3 py-2 bg-white border border-gray-300 rounded-md cursor-pointer text-sm focus:outline-none focus:ring-1 focus:ring-slate-700 focus:border-transparent"
+                >
+                  {formData.state || "All States"}
+                </div>
+
+                {showStateDropdown && (
+                  <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg z-10 max-h-60 overflow-y-auto">
+                    <div className="p-2 border-b border-gray-200">
+                      <input
+                        type="text"
+                        value={stateSearch}
+                        onChange={(e) => setStateSearch(e.target.value)}
+                        placeholder="Search state..."
+                        className="w-full px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none"
+                      />
+                    </div>
+
+                    {stateData.values
+                      .filter((state) =>
+                        state.toLowerCase().includes(stateSearch.toLowerCase())
+                      )
+                      .map((state) => (
+                        <div
+                          key={state}
+                          onClick={() => {
+                            handleInputChange("state", state);
+                            setShowStateDropdown(false);
+                            setStateSearch("");
+                          }}
+                          className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer"
+                        >
+                          {state}
+                        </div>
+                      ))}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Course
               </label>
-              <select
-                value={formData.course}
-                onChange={(e) => handleInputChange("course", e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-1 focus:ring-slate-700 focus:border-transparent"
-              >
-                <option value="" disabled>
-                  Course
-                </option>
-                {courseOptions.map((course) => (
-                  <option key={course} value={course}>
-                    {course}
-                  </option>
-                ))}
-              </select>
+              <div ref={courseDropdownRef} className="relative w-full">
+                <div
+                  onClick={() => setShowCourseDropdown((prev) => !prev)}
+                  className="px-3 py-2 bg-white border border-gray-300 rounded-md cursor-pointer text-sm focus:outline-none focus:ring-1 focus:ring-slate-700 focus:border-transparent"
+                >
+                  {formData.course || "Course"}
+                </div>
+
+                {showCourseDropdown && (
+                  <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg z-10 max-h-60 overflow-y-auto">
+                    <div className="p-2 border-b border-gray-200">
+                      <input
+                        type="text"
+                        value={courseSearch}
+                        onChange={(e) => setCourseSearch(e.target.value)}
+                        placeholder="Search course..."
+                        className="w-full px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none"
+                      />
+                    </div>
+
+                    {courseOptions
+                      .filter((course) =>
+                        course.toLowerCase().includes(courseSearch.toLowerCase())
+                      )
+                      .map((course) => (
+                        <div
+                          key={course}
+                          onClick={() => {
+                            handleInputChange("course", course);
+                            setShowCourseDropdown(false);
+                            setCourseSearch("");
+                          }}
+                          className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer"
+                        >
+                          {course}
+                        </div>
+                      ))}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Specialization
               </label>
-              <select
-                value={formData.specialization}
-                onChange={(e) =>
-                  handleInputChange("specialization", e.target.value)
-                }
-                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-1 focus:ring-slate-700 focus:border-transparent"
-              >
-                <option value="" disabled>
-                  All Specializations
-                </option>
-                {specializationData.values.map((spec) => (
-                  <option key={spec} value={spec}>
-                    {spec}
-                  </option>
-                ))}
-              </select>
+              <div ref={specializationDropdownRef} className="relative w-full">
+                <div
+                  onClick={() => setShowSpecializationDropdown((prev) => !prev)}
+                  className="px-3 py-2 bg-white border border-gray-300 rounded-md cursor-pointer text-sm focus:outline-none focus:ring-1 focus:ring-slate-700 focus:border-transparent"
+                  title={formData.specialization || specializationData.group}
+                >
+                  {formData.specialization || specializationData.group}
+                </div>
+
+                {showSpecializationDropdown && (
+                  <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg z-10 max-h-60 overflow-y-auto">
+                    <div className="p-2 border-b border-gray-200">
+                      <input
+                        type="text"
+                        value={specializationSearch}
+                        onChange={(e) => setSpecializationSearch(e.target.value)}
+                        placeholder="Search specialization..."
+                        className="w-full px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none"
+                      />
+                    </div>
+
+                    {specializationData.values
+                      .filter((item) =>
+                        item
+                          .toLowerCase()
+                          .includes(specializationSearch.toLowerCase())
+                      )
+                      .map((item) => (
+                        <div
+                          key={item}
+                          onClick={() => {
+                            handleInputChange("specialization", item);
+                            setShowSpecializationDropdown(false);
+                            setSpecializationSearch("");
+                          }}
+                          className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer break-words"
+                        >
+                          {item}
+                        </div>
+                      ))}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div>
