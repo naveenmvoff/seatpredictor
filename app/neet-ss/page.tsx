@@ -47,6 +47,9 @@ export default function Results() {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [apiResult, setApiResult] = useState<any>(null);
+  console.log("API RESULT =======", apiResult);
+  const [apiForm, setApiForm] = useState<any>(null);
+  const [apiLoading, setApiLoading] = useState<boolean>(false);
 
   const [dropdownData, setDropdownData] = useState<GroupCategory[]>([]);
   console.log("Fetched group categories:==========", dropdownData);
@@ -124,9 +127,7 @@ export default function Results() {
     ? getSpecializationOptions(formData.course)
     : [];
 
-  console.log("Course options:", courseOptions);
-  console.log("Current formData.course:", formData?.course);
-  console.log("Specialization options:", specializationOptions);
+  console.log("Current formData========:", formData);
 
   // Sample college data
   const colleges: College[] = [
@@ -329,16 +330,56 @@ export default function Results() {
   }, []);
 
   // Handle update button click
-  const handleUpdateFilters = () => {
-    if (formData) {
-      const NEET_SSDATA = {
-        ...formData,
-        qualifying_group: formData.course,
-        specialization: formData.specialization,
-      };
-      console.log("NEET_SS", NEET_SSDATA);
-      filterColleges(formData);
+  // const handleUpdateFilters = () => {
+  //   if (formData) {
+  //     const NEET_SSDATA = {
+  //       ...formData,
+  //       qualifying_group: formData.course,
+  //       specialization: formData.specialization,
+  //     };
+  //     console.log("NEET_SS", NEET_SSDATA);
+  //     filterColleges(formData);
+  //   }
+  // };
+
+  const handleUpdateFilters = async () => {
+    if (!formData) return;
+
+    setApiLoading(true);
+
+    // Build API payload from current formData
+    const payload = {
+      name: formData.name,
+      phone_number: (formData as any).phone, // from landing page state
+      email: formData.email,
+      rank_no: Number(formData.rank),
+      state: formData.state,
+      allotment_category: "NEET_PG",
+      qualifying_group_or_course: formData.course,
+      specialization: formData.specialization,
+      category: formData.category,
+    };
+
+    try {
+      const res = await fetch("http://127.0.0.1:8000/api/allotment_tracker/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      setApiResult(data);
+
+      // persist for refresh / navigation parity
+      sessionStorage.setItem("neetPgResult", JSON.stringify(data));
+      sessionStorage.setItem("neetPgForm", JSON.stringify(payload));
+    } catch (err) {
+      console.error("NEET_PG API error (update)", err);
+    } finally {
+      setApiLoading(false);
     }
+
+    // Keep local filter behavior too (optional)
+    filterColleges(formData);
   };
 
   const totalPages = Math.ceil(filteredColleges.length / rowsPerPage);
@@ -488,6 +529,17 @@ export default function Results() {
 
                 {showCourseDropdown && (
                   <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg z-10 max-h-60 overflow-y-auto">
+                    <div className="p-2 border-b border-gray-200">
+                      <input
+                        type="text"
+                        value={courseSearch}
+                        onChange={(e) => setCourseSearch(e.target.value)}
+                        onMouseDown={(e) => e.stopPropagation()}
+                        placeholder="Search specialization"
+                        className="w-full px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none"
+                      />
+                    </div>
+
                     {courseOptions
                       .filter((course) =>
                         course
@@ -500,29 +552,6 @@ export default function Results() {
                           onMouseDown={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                            console.log("Selecting course:", course);
-                            handleInputChange("course", course);
-                            // Reset specialization when course changes
-                            handleInputChange("specialization", "");
-                            setShowCourseDropdown(false);
-                            setCourseSearch("");
-                          }}
-                          className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer"
-                        >
-                          {course}
-                        </div>
-                      ))}
-
-                    {courseOptions
-                      .filter((course) =>
-                        course
-                          .toLowerCase()
-                          .includes(courseSearch.toLowerCase())
-                      )
-                      .map((course) => (
-                        <div
-                          key={course}
-                          onClick={() => {
                             console.log("Selecting course:", course);
                             handleInputChange("course", course);
                             // Reset specialization when course changes
@@ -577,7 +606,6 @@ export default function Results() {
                         No specializations available for selected group
                       </div>
                     ) : (
-
                       specializationOptions
                         .filter((item) =>
                           item
