@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
@@ -48,10 +48,20 @@ export default function Results() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [apiResult, setApiResult] = useState<any>(null);
 
-  const [dropdownData, setDropdownData] = useState<GroupCategory[]>([]);
+const [dropdownData, setDropdownData] = useState<GroupCategory[]>([]);
   console.log("Fetched group categories:==========", dropdownData);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Dropdown state variables
+  const [showCourseDropdown, setShowCourseDropdown] = useState(false);
+  const [showSpecializationDropdown, setShowSpecializationDropdown] = useState(false);
+  const [courseSearch, setCourseSearch] = useState("");
+  const [specializationSearch, setSpecializationSearch] = useState("");
+  
+  // Dropdown refs
+  const courseDropdownRef = useRef<HTMLDivElement>(null);
+  const specializationDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchGroupCategories = async () => {
@@ -91,19 +101,31 @@ export default function Results() {
     "Rajasthan",
   ];
 
-  const specializationOptions = [
-    "M.D. (Anaesthesiology)",
-    "M.D. (General Medicine)",
-    "M.S. (General Surgery)",
-    "M.D. (Pediatrics)",
-    "M.D. (Radiology)",
-    "M.D. (Dermatology)",
-    "M.D. (Psychiatry)",
-    "M.D. (Pathology)",
-    "M.D. (Microbiology)",
-  ];
+// Filter groups excluding DNB, MD/MS, and state
+  const courseOptions = dropdownData
+    .filter(
+      (group) =>
+        group.group_name !== "DNB" &&
+        group.group_name !== "MD/MS" &&
+        group.group_name !== "state"
+    )
+    .map((group) => group.group_name);
 
-  const courseOptions = ["MD/MS", "DNB"];
+  // Get specialization options based on selected course
+  const getSpecializationOptions = (course: string) => {
+    const selectedGroup = dropdownData.find(
+      (group) => group.group_name === course
+    );
+    return selectedGroup?.category_type || [];
+  };
+
+  const specializationOptions = formData?.course
+    ? getSpecializationOptions(formData.course)
+    : [];
+
+  console.log("Course options:", courseOptions);
+  console.log("Current formData.course:", formData?.course);
+  console.log("Specialization options:", specializationOptions);
 
   // Sample college data
   const colleges: College[] = [
@@ -271,9 +293,35 @@ export default function Results() {
     }
   };
 
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      // If click happens outside the dropdown containers, close them
+      const target = e.target as Node;
+      if (courseDropdownRef.current && !courseDropdownRef.current.contains(target)) {
+        setShowCourseDropdown(false);
+      }
+      if (
+        specializationDropdownRef.current &&
+        !specializationDropdownRef.current.contains(target)
+      ) {
+        setShowSpecializationDropdown(false);
+      }
+    };
+
+    document.addEventListener("click", onClick);
+    return () => document.removeEventListener("click", onClick);
+  }, []);
+
   // Handle update button click
   const handleUpdateFilters = () => {
     if (formData) {
+      const NEET_SSDATA = {
+        ...formData,
+        qualifying_group: formData.course,
+        specialization: formData.specialization,
+      };
+      console.log("NEET_SS", NEET_SSDATA);
       filterColleges(formData);
     }
   };
@@ -415,37 +463,103 @@ export default function Results() {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Qualifying Group
               </label>
-              <select
-                value={formData.course}
-                onChange={(e) => handleInputChange("course", e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-1 focus:ring-slate-700 focus:border-transparent"
-              >
-                {courseOptions.map((course) => (
-                  <option key={course} value={course}>
-                    {course}
-                  </option>
-                ))}
-              </select>
+              <div ref={courseDropdownRef} className="relative w-full">
+                <div
+                  onClick={() => setShowCourseDropdown((prev) => !prev)}
+                  className="px-3 py-2 bg-white border border-gray-300 rounded-md cursor-pointer text-sm focus:outline-none focus:ring-1 focus:ring-slate-700 focus:border-transparent"
+                >
+                  {formData.course || "Select Qualifying Group"}
+                </div>
+
+{showCourseDropdown && (
+                  <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg z-10 max-h-60 overflow-y-auto">
+                    {courseOptions
+                      .filter((course) =>
+                        course
+                          .toLowerCase()
+                          .includes(courseSearch.toLowerCase())
+                      )
+                      .map((course) => (
+                        <div
+                          key={course}
+                          onClick={() => {
+                            console.log("Selecting course:", course);
+                            handleInputChange("course", course);
+                            // Reset specialization when course changes
+                            handleInputChange("specialization", "");
+                            setShowCourseDropdown(false);
+                            setCourseSearch("");
+                          }}
+                          className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer"
+                        >
+                          {course}
+                        </div>
+                      ))}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Specialization
               </label>
-              <select
-                value={formData.specialization}
-                onChange={(e) =>
-                  handleInputChange("specialization", e.target.value)
-                }
-                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-1 focus:ring-slate-700 focus:border-transparent"
-              >
-                <option value="">All Specializations</option>
-                {specializationOptions.map((spec) => (
-                  <option key={spec} value={spec}>
-                    {spec}
-                  </option>
-                ))}
-              </select>
+              <div ref={specializationDropdownRef} className="relative w-full">
+                <div
+                  onClick={() => setShowSpecializationDropdown((prev) => !prev)}
+                  className="px-3 py-2 bg-white border border-gray-300 rounded-md cursor-pointer text-sm focus:outline-none focus:ring-1 focus:ring-slate-700 focus:border-transparent"
+                  title={formData.specialization || "Select Specialization"}
+                >
+                  {formData.specialization || "Select Specialization"}
+                </div>
+
+                {showSpecializationDropdown && (
+                  <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg z-10 max-h-60 overflow-y-auto">
+                    <div className="p-2 border-b border-gray-200">
+                      <input
+                        type="text"
+                        value={specializationSearch}
+                        onChange={(e) =>
+                          setSpecializationSearch(e.target.value)
+                        }
+                        placeholder="Search specialization"
+                        className="w-full px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none"
+                      />
+                    </div>
+
+{!formData?.course ? (
+                      <div className="px-3 py-2 text-sm text-gray-500">
+                        Please select a qualifying group first
+                      </div>
+                    ) : specializationOptions.length === 0 ? (
+                      <div className="px-3 py-2 text-sm text-gray-500">
+                        No specializations available for selected group
+                      </div>
+                    ) : (
+                      specializationOptions
+                        .filter((item) =>
+                          item
+                            .toLowerCase()
+                            .includes(specializationSearch.toLowerCase())
+                        )
+                        .map((item) => (
+                          <div
+                            key={item}
+                            onClick={() => {
+                              console.log("Selecting specialization:", item);
+                              handleInputChange("specialization", item);
+                              setShowSpecializationDropdown(false);
+                              setSpecializationSearch("");
+                            }}
+                            className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer break-words"
+                          >
+                            {item}
+                          </div>
+                        ))
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="flex items-end">

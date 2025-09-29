@@ -394,6 +394,9 @@ export default function Results() {
           </div>
         </div>
 
+        <div>
+          <button className="text-lg font-semibold mb-2">Download Result</button>
+        </div>
         {/* Filter Section - Responsive */}
         <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6 mb-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 items-end">
