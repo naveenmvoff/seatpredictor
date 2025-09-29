@@ -343,6 +343,7 @@ export default function Results() {
   // };
 
   const handleUpdateFilters = async () => {
+    console.log("Updating filters with formData:", formData);
     if (!formData) return;
 
     setApiLoading(true);
@@ -354,7 +355,7 @@ export default function Results() {
       email: formData.email,
       rank_no: Number(formData.rank),
       state: formData.state,
-      allotment_category: "NEET_PG",
+      allotment_category: "NEET_SS",
       qualifying_group_or_course: formData.course,
       specialization: formData.specialization,
       category: formData.category,
@@ -794,7 +795,7 @@ export default function Results() {
                 Next
               </button>
             </div>
-            <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+            {/* <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
               <div className="flex items-center space-x-2">
                 <span className="text-sm text-gray-700">
                   {startIndex + 1}-{Math.min(endIndex, filteredColleges.length)}{" "}
@@ -859,7 +860,7 @@ export default function Results() {
                   </svg>
                 </button>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </main>
