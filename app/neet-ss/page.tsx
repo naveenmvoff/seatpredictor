@@ -488,7 +488,7 @@ export default function Results() {
 
                 {showCourseDropdown && (
                   <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg z-10 max-h-60 overflow-y-auto">
-                    {/* {courseOptions
+                    {courseOptions
                       .filter((course) =>
                         course
                           .toLowerCase()
@@ -511,7 +511,7 @@ export default function Results() {
                         >
                           {course}
                         </div>
-                      ))} */}
+                      ))}
 
                     {courseOptions
                       .filter((course) =>
@@ -577,30 +577,6 @@ export default function Results() {
                         No specializations available for selected group
                       </div>
                     ) : (
-                      // (
-                      //   specializationOptions
-                      //     .filter((item) =>
-                      //       item
-                      //         .toLowerCase()
-                      //         .includes(specializationSearch.toLowerCase())
-                      //     )
-                      //     .map((item) => (
-                      //       <div
-                      //         key={item}
-                      //         onMouseDown={(e) => {
-                      //           e.preventDefault();
-                      //           e.stopPropagation();
-                      //           console.log("Selecting specialization:", item);
-                      //           handleInputChange("specialization", item);
-                      //           setShowSpecializationDropdown(false);
-                      //           setSpecializationSearch("");
-                      //         }}
-                      //         className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer break-words"
-                      //       >
-                      //         {item}
-                      //       </div>
-                      //     ))
-                      // )
 
                       specializationOptions
                         .filter((item) =>
