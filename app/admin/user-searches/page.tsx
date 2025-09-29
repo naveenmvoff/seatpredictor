@@ -1,87 +1,146 @@
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useState, useEffect } from "react";
+
+// Interface for user search data
+interface UserSearchData {
+  id: number;
+  name: string;
+  phone: string;
+  email: string;
+  exam: string;
+  rank: string;
+  category: string;
+  state: string;
+  specialization: string;
+  course: string;
+  searchTime: string;
+  results: number;
+  resultsBadge?: string;
+}
+
+// API endpoint function to fetch user data
+// const fetchUserData = async (): Promise<UserSearchData[]> => {
+//   try {
+//     const response = await fetch('http://127.0.0.1:8000/admin/user-data', {
+//       method: 'GET',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//     })
+
+//     if (!response.ok) {
+//       throw new Error(`HTTP error! status: ${response.status}`)
+//     }
+
+//     const data = await response.json()
+//     console.log('Fetched user data:==========', data)
+
+//     // Transform data and add resultsBadge based on results count
+//     return data.map((item: UserSearchData) => ({
+//       ...item,
+//       resultsBadge: item.results === 0
+//         ? "bg-red-100 text-red-800"
+//         : "bg-green-100 text-green-800"
+//     }))
+//   } catch (error) {
+//     console.error('Error fetching user data:', error)
+//     throw error
+//   }
+// }
 
 export default function UserSearches() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [dateRange, setDateRange] = useState("Aug 30, 2025 - Sep 29, 2025")
-  const [examFilter, setExamFilter] = useState("All Exams")
-  const [categoryFilter, setCategoryFilter] = useState("All Categories")
+  const [searchQuery, setSearchQuery] = useState("");
+  const [dateRange, setDateRange] = useState("Aug 30, 2025 - Sep 29, 2025");
+  const [examFilter, setExamFilter] = useState("All Exams");
+  const [categoryFilter, setCategoryFilter] = useState("All Categories");
+  const [searchData, setSearchData] = useState<UserSearchData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const searchData = [
-    {
-      id: 1,
-      name: "Rahul Sharma",
-      phone: "+91 9876543210",
-      email: "rahul.sharma@email.com",
-      exam: "NEET-PG",
-      rank: "5,234",
-      category: "OBC",
-      state: "Maharashtra",
-      specialization: "General Medicine",
-      course: "MD/MS",
-      searchTime: "2024-12-20 10:30 AM",
-      results: 42,
-      resultsBadge: "bg-green-100 text-green-800",
-    },
-    {
-      id: 2,
-      name: "Priya Patel",
-      phone: "+91 9876543211",
-      email: "priya.patel@email.com",
-      exam: "NEET-PG",
-      rank: "12,450",
-      category: "General",
-      state: "Gujarat",
-      specialization: "Pediatrics",
-      course: "MD/MS",
-      searchTime: "2024-12-20 09:45 AM",
-      results: 28,
-      resultsBadge: "bg-green-100 text-green-800",
-    },
-    {
-      id: 3,
-      name: "Amit Kumar",
-      phone: "+91 9876543212",
-      email: "amit.kumar@email.com",
-      exam: "NEET-SS",
-      rank: "890",
-      category: "SC",
-      state: "Delhi",
-      specialization: "Cardiology",
-      course: "DM/MCh",
-      searchTime: "2024-12-20 09:15 AM",
-      results: 15,
-      resultsBadge: "bg-green-100 text-green-800",
-    },
-    {
-      id: 4,
-      name: "Sneha Reddy",
-      phone: "+91 9876543213",
-      email: "sneha.reddy@email.com",
-      exam: "NEET-PG",
-      rank: "25,670",
-      category: "OBC",
-      state: "Telangana",
-      specialization: "Radiology",
-      course: "MD/MS",
-      searchTime: "2024-12-20 08:30 AM",
-      results: 0,
-      resultsBadge: "bg-red-100 text-red-800",
-    },
-  ]
+  const fetchUserData = async (): Promise<UserSearchData[]> => {
+    try {
+      console.log("Fetching user data from API...");
+      const response = await fetch("http://127.0.0.1:8000/admin/user-data", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!response.ok)
+        throw new Error(`HTTP error! status: ${response.status}`);
+
+      const data = await response.json();
+
+      console.log("Fetched user data:==========", data);
+
+      // Transform data and add resultsBadge
+      return data.map((item: UserSearchData) => ({
+        ...item,
+        resultsBadge:
+          item.results === 0
+            ? "bg-red-100 text-red-800"
+            : "bg-green-100 text-green-800",
+      }));
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      return [];
+    }
+  };
+
+  const loadUserData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await fetchUserData();
+      setSearchData(data);
+      console.log("Data loaded into state:", data);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "An error occurred while fetching data"
+      );
+      console.error("Failed to load user data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch user data on component mount
+  useEffect(() => {
+    loadUserData();
+  }, []);
+
+  // Refresh function for manual reload
+  const refreshData = () => {
+    loadUserData();
+  };
 
   return (
     <div className="space-y-6">
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">User Searches</h1>
-          <p className="text-gray-600 mt-1">Track and analyze user search history</p>
+          <h1 className="text-2xl font-semibold text-gray-900">
+            User Searches
+          </h1>
+          <p className="text-gray-600 mt-1">
+            Track and analyze user search history
+          </p>
         </div>
-        <button className="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2 hover:bg-slate-700">
-          Export CSV
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={refreshData}
+            disabled={loading}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <span className={loading ? "animate-spin" : ""}>🔄</span>
+            {loading ? "Loading..." : "Refresh"}
+          </button>
+          <button className="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2 hover:bg-slate-700">
+            Export CSV
+          </button>
+        </div>
       </div>
 
       {/* Filters Section */}
@@ -89,12 +148,13 @@ export default function UserSearches() {
         <div className="flex items-center gap-2 mb-4">
           <h2 className="text-lg font-semibold text-gray-900">Filters</h2>
         </div>
-        <p className="text-gray-600 text-sm mb-6">Filter search results by various criteria</p>
+        <p className="text-gray-600 text-sm mb-6">
+          Filter search results by various criteria
+        </p>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            </div>
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"></div>
             <input
               type="text"
               placeholder="Search by name, email, phone..."
@@ -105,8 +165,7 @@ export default function UserSearches() {
           </div>
 
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            </div>
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"></div>
             <input
               type="text"
               value={dateRange}
@@ -142,8 +201,14 @@ export default function UserSearches() {
       {/* Search History Table */}
       <div className="bg-white rounded-lg shadow-sm">
         <div className="p-6 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">Search History</h2>
-          <p className="text-gray-600 text-sm mt-1">Showing 5 search records</p>
+          <h2 className="text-lg font-semibold text-gray-900">
+            Search History
+          </h2>
+          <p className="text-gray-600 text-sm mt-1">
+            {loading
+              ? "Loading..."
+              : `Showing ${searchData.length} search records`}
+          </p>
         </div>
 
         <div className="overflow-x-auto">
@@ -156,8 +221,12 @@ export default function UserSearches() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Contact
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Exam</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rank</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Exam
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Rank
+                </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Category
                 </th>
@@ -179,60 +248,113 @@ export default function UserSearches() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {searchData.map((record) => (
-                <tr key={record.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center mr-3">
-                        <span className="text-gray-600 text-sm">👤</span>
-                      </div>
-                      <div className="text-sm font-medium text-gray-900">{record.name}</div>
+              {loading ? (
+                <tr>
+                  <td
+                    colSpan={10}
+                    className="px-6 py-4 text-center text-gray-500"
+                  >
+                    <div className="flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900 mr-2"></div>
+                      Loading user data...
                     </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      <div className="flex items-center gap-1 mb-1">
-                        <span className="text-gray-400">📞</span>
-                        <span>{record.phone}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <span className="text-gray-400">✉️</span>
-                        <span className="text-blue-600">{record.email}</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm text-gray-900">{record.exam}</span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm text-gray-900">{record.rank}</span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm text-gray-900">{record.category}</span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm text-gray-900">{record.state}</span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm text-gray-900">{record.specialization}</span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm text-gray-900">{record.course}</span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm text-gray-900">{record.searchTime}</span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${record.resultsBadge}`}>
-                      {record.results === 0 ? "No Results" : record.results}
-                    </span>
                   </td>
                 </tr>
-              ))}
+              ) : error ? (
+                <tr>
+                  <td
+                    colSpan={10}
+                    className="px-6 py-4 text-center text-red-500"
+                  >
+                    <div className="flex items-center justify-center">
+                      <span className="text-red-400 mr-2"></span>
+                      Error: {error}
+                    </div>
+                  </td>
+                </tr>
+              ) : searchData.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={10}
+                    className="px-6 py-4 text-center text-gray-500"
+                  >
+                    No search records found.
+                  </td>
+                </tr>
+              ) : (
+                searchData.map((record) => (
+                  <tr key={record.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center mr-3">
+                          <span className="text-gray-600 text-sm">👤</span>
+                        </div>
+                        <div className="text-sm font-medium text-gray-900">
+                          {record.name}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">
+                        <div className="flex items-center gap-1 mb-1">
+                          <span className="text-gray-400">📞</span>
+                          <span>{record.phone}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <span className="text-gray-400">✉️</span>
+                          <span className="text-blue-600">{record.email}</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="text-sm text-gray-900">
+                        {record.exam}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="text-sm text-gray-900">
+                        {record.rank}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="text-sm text-gray-900">
+                        {record.category}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="text-sm text-gray-900">
+                        {record.state}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="text-sm text-gray-900">
+                        {record.specialization}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="text-sm text-gray-900">
+                        {record.course}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="text-sm text-gray-900">
+                        {record.searchTime}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span
+                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${record.resultsBadge}`}
+                      >
+                        {record.results === 0 ? "No Results" : record.results}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
       </div>
     </div>
-  )
+  );
 }
