@@ -82,13 +82,7 @@ export default function Results() {
     fetchGroupCategories();
   }, []);
 
-  // Available options for dropdowns
-  const stateOptions = [
-    "Delhi",
-    "Maharashtra",
-    "Karnataka",
-  ];
-
+  // Dynamic options from API
   const stateGroup = dropdownData.find(
     (g) => g.group_name?.toLowerCase() === "state"
   );
@@ -97,17 +91,24 @@ export default function Results() {
     values: stateGroup?.category_type ?? [],
   };
 
-  const specializationOptions = [
-    "M.D. (Anaesthesiology)",
-    "M.D. (General Medicine)",
-    "M.S. (General Surgery)",
-    "M.D. (Pediatrics)",
-    "M.D. (Radiology)",
-    "M.D. (Dermatology)",
-    "M.D. (Psychiatry)",
-    "M.D. (Pathology)",
-    "M.D. (Microbiology)",
-  ];
+  // Specialization options based on selected course (MD/MS or DNB)
+  const specializationGroup = dropdownData.find(
+    (g) => g.group_name?.toLowerCase() === (formData?.course || "").toLowerCase()
+  );
+  const specializationData: LabeledValues = {
+    group: "Specialization",
+    values: specializationGroup?.category_type ?? [],
+  };
+
+  // Clear specialization if it doesn't belong to the selected course
+  useEffect(() => {
+    if (
+      formData?.specialization &&
+      !specializationData.values.includes(formData.specialization)
+    ) {
+      setFormData((prev) => (prev ? { ...prev, specialization: "" } : prev));
+    }
+  }, [formData?.course, dropdownData]);
 
   const categoryOptions = [
     "EWS",
@@ -382,7 +383,7 @@ export default function Results() {
                 <option value="" disabled>
                   All States
                 </option>
-                {stateOptions.map((state) => (
+                {stateData.values.map((state) => (
                   <option key={state} value={state}>
                     {state}
                   </option>
@@ -424,7 +425,7 @@ export default function Results() {
                 <option value="" disabled>
                   All Specializations
                 </option>
-                {specializationOptions.map((spec) => (
+                {specializationData.values.map((spec) => (
                   <option key={spec} value={spec}>
                     {spec}
                   </option>
