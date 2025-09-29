@@ -5,6 +5,9 @@ import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import Breadcrumb from "@/components/Breadcrumb";
 import Footer from "@/components/Footer";
+import { Download, Mail } from "lucide-react";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 interface College {
   id: number;
@@ -294,6 +297,49 @@ export default function Results() {
     filterColleges(formData);
   };
 
+  const handleDownloadPDF = () => {
+    const doc = new jsPDF();
+    doc.setFontSize(14);
+    doc.text("NEET PG Seat Predictor Results", 14, 16);
+
+    const tableData = (apiRows || currentColleges).map(
+      (row: any, index: number) => [
+        index + 1,
+        row.rank_no || row.rank,
+        row.allotted_institute || row.name,
+        row.state,
+        row.candidate_category || row.category,
+      ]
+    );
+
+    autoTable(doc, {
+      head: [["Sr. No", "Rank", "College", "State", "Category"]],
+      body: tableData,
+      startY: 22,
+    });
+
+    doc.save("NEET-PG-Results.pdf");
+  };
+
+  const handleSendEmail = async () => {
+    try {
+      const res = await fetch("http://127.0.0.1:8000/api/send-results-email/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: userData?.email,
+          results: apiRows || currentColleges,
+        }),
+      });
+
+      if (!res.ok) throw new Error("Email failed");
+      alert("Results sent to your email!");
+    } catch (err) {
+      console.error("Email error:", err);
+      alert("Failed to send email.");
+    }
+  };
+
   const totalPages = Math.ceil(filteredColleges.length / rowsPerPage);
   const startIndex = (currentPage - 1) * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
@@ -324,7 +370,7 @@ export default function Results() {
         </div>
 
         {/* Main Heading */}
-        <div className="mb-6 sm:mb-8">
+        <div className="mb-6 sm:mb-3">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
             See which college you can get. One simple search.
           </h1>
@@ -393,10 +439,23 @@ export default function Results() {
             </div>
           </div>
         </div>
-
-        <div className="flex justify-end">
-          <button className="text-lg font-semibold mb-2">Download Result</button>
+        <div className="flex justify-end space-x-3 mb-2">
+          <button
+            onClick={handleDownloadPDF}
+            className="flex items-center gap-1 px-2.5 py-1.5 bg-slate-700 hover:bg-slate-800 text-white rounded-md text-sm font-medium transition-colors shadow-sm"
+          >
+            <Download size={14} />
+            Download
+          </button>
+          <button
+            onClick={handleSendEmail}
+            className="flex items-center gap-1 px-2.5 py-1.5 bg-slate-700 hover:bg-slate-800 text-white rounded-md text-sm font-medium transition-colors shadow-sm"
+          >
+            <Mail size={14} />
+            Email
+          </button>
         </div>
+
         {/* Filter Section - Responsive */}
         <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6 mb-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 items-end">
