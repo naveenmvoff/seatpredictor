@@ -48,17 +48,18 @@ export default function Results() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [apiResult, setApiResult] = useState<any>(null);
 
-const [dropdownData, setDropdownData] = useState<GroupCategory[]>([]);
+  const [dropdownData, setDropdownData] = useState<GroupCategory[]>([]);
   console.log("Fetched group categories:==========", dropdownData);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Dropdown state variables
   const [showCourseDropdown, setShowCourseDropdown] = useState(false);
-  const [showSpecializationDropdown, setShowSpecializationDropdown] = useState(false);
+  const [showSpecializationDropdown, setShowSpecializationDropdown] =
+    useState(false);
   const [courseSearch, setCourseSearch] = useState("");
   const [specializationSearch, setSpecializationSearch] = useState("");
-  
+
   // Dropdown refs
   const courseDropdownRef = useRef<HTMLDivElement>(null);
   const specializationDropdownRef = useRef<HTMLDivElement>(null);
@@ -101,7 +102,7 @@ const [dropdownData, setDropdownData] = useState<GroupCategory[]>([]);
     "Rajasthan",
   ];
 
-// Filter groups excluding DNB, MD/MS, and state
+  // Filter groups excluding DNB, MD/MS, and state
   const courseOptions = dropdownData
     .filter(
       (group) =>
@@ -286,21 +287,34 @@ const [dropdownData, setDropdownData] = useState<GroupCategory[]>([]);
     }
   }, [router]);
 
-  // Handle form input changes
   const handleInputChange = (field: keyof PredictorData, value: string) => {
-    if (formData) {
-      setFormData({ ...formData, [field]: value });
-    }
+    setFormData((prev) => {
+      const base: Partial<PredictorData> = prev || {
+        name: "",
+        phone: "",
+        email: "",
+        rank: "",
+        state: "",
+        specialization: "",
+        course: "",
+        category: "",
+        exam: "",
+      };
+      return { ...base, [field]: value } as PredictorData;
+    });
   };
 
-  // Close dropdowns when clicking outside
   useEffect(() => {
-    const onClick = (e: MouseEvent) => {
-      // If click happens outside the dropdown containers, close them
-      const target = e.target as Node;
-      if (courseDropdownRef.current && !courseDropdownRef.current.contains(target)) {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+
+      if (
+        courseDropdownRef.current &&
+        !courseDropdownRef.current.contains(target)
+      ) {
         setShowCourseDropdown(false);
       }
+
       if (
         specializationDropdownRef.current &&
         !specializationDropdownRef.current.contains(target)
@@ -309,8 +323,9 @@ const [dropdownData, setDropdownData] = useState<GroupCategory[]>([]);
       }
     };
 
-    document.addEventListener("click", onClick);
-    return () => document.removeEventListener("click", onClick);
+    // use 'click' so React synthetic handlers on the target run first
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
   // Handle update button click
@@ -471,8 +486,33 @@ const [dropdownData, setDropdownData] = useState<GroupCategory[]>([]);
                   {formData.course || "Select Qualifying Group"}
                 </div>
 
-{showCourseDropdown && (
+                {showCourseDropdown && (
                   <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg z-10 max-h-60 overflow-y-auto">
+                    {/* {courseOptions
+                      .filter((course) =>
+                        course
+                          .toLowerCase()
+                          .includes(courseSearch.toLowerCase())
+                      )
+                      .map((course) => (
+                        <div
+                          key={course}
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            console.log("Selecting course:", course);
+                            handleInputChange("course", course);
+                            // Reset specialization when course changes
+                            handleInputChange("specialization", "");
+                            setShowCourseDropdown(false);
+                            setCourseSearch("");
+                          }}
+                          className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer"
+                        >
+                          {course}
+                        </div>
+                      ))} */}
+
                     {courseOptions
                       .filter((course) =>
                         course
@@ -522,12 +562,13 @@ const [dropdownData, setDropdownData] = useState<GroupCategory[]>([]);
                         onChange={(e) =>
                           setSpecializationSearch(e.target.value)
                         }
+                        onMouseDown={(e) => e.stopPropagation()}
                         placeholder="Search specialization"
                         className="w-full px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none"
                       />
                     </div>
 
-{!formData?.course ? (
+                    {!formData?.course ? (
                       <div className="px-3 py-2 text-sm text-gray-500">
                         Please select a qualifying group first
                       </div>
@@ -536,6 +577,31 @@ const [dropdownData, setDropdownData] = useState<GroupCategory[]>([]);
                         No specializations available for selected group
                       </div>
                     ) : (
+                      // (
+                      //   specializationOptions
+                      //     .filter((item) =>
+                      //       item
+                      //         .toLowerCase()
+                      //         .includes(specializationSearch.toLowerCase())
+                      //     )
+                      //     .map((item) => (
+                      //       <div
+                      //         key={item}
+                      //         onMouseDown={(e) => {
+                      //           e.preventDefault();
+                      //           e.stopPropagation();
+                      //           console.log("Selecting specialization:", item);
+                      //           handleInputChange("specialization", item);
+                      //           setShowSpecializationDropdown(false);
+                      //           setSpecializationSearch("");
+                      //         }}
+                      //         className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer break-words"
+                      //       >
+                      //         {item}
+                      //       </div>
+                      //     ))
+                      // )
+
                       specializationOptions
                         .filter((item) =>
                           item

@@ -394,7 +394,7 @@ export default function Results() {
           </div>
         </div>
 
-        <div>
+        <div className="flex justify-end">
           <button className="text-lg font-semibold mb-2">Download Result</button>
         </div>
         {/* Filter Section - Responsive */}
