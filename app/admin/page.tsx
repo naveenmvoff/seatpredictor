@@ -1,38 +1,40 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { BarChart3, TrendingUp, Users, AlertCircle, MapPin, GraduationCap, Award, Download } from "lucide-react"
 
 export default function AdminDashboard() {
   const [dateRange, setDateRange] = useState("Aug 30, 2025 - Sep 29, 2025")
   const [examFilter, setExamFilter] = useState("All Exams")
+  const [isLoading, setIsLoading] = useState(false)
 
   const stats = [
     {
       title: "Total Searches",
       value: "12,543",
       change: "+20.1% from last month",
-      icon: "",
+      icon: <BarChart3 className="w-6 h-6" />,
       color: "border-l-blue-500",
     },
     {
       title: "Unique Users",
       value: "8,234",
       change: "+15.3% from last month",
-      icon: "",
+      icon: <Users className="w-6 h-6" />,
       color: "border-l-cyan-500",
     },
     {
       title: "Success Rate",
       value: "94.2%",
       change: "Searches with results",
-      icon: "",
+      icon: <TrendingUp className="w-6 h-6" />,
       color: "border-l-green-500",
     },
     {
       title: "Zero Results",
       value: "732",
       change: "5.8% of all searches",
-      icon: "",
+      icon: <AlertCircle className="w-6 h-6" />,
       color: "border-l-yellow-500",
     },
   ]
@@ -48,12 +50,42 @@ export default function AdminDashboard() {
   ]
 
   const stateData = [
-    { state: "Maharashtra", searches: 1000, avgResults: 950 },
-    { state: "Karnataka", searches: 850, avgResults: 800 },
-    { state: "Tamil Nadu", searches: 750, avgResults: 700 },
-    { state: "Delhi", searches: 650, avgResults: 500 },
-    { state: "Gujarat", searches: 550, avgResults: 480 },
+    { state: "Maharashtra", searches: 1000, zeroResults: 50, avgResults: 950 },
+    { state: "Karnataka", searches: 850, zeroResults: 50, avgResults: 800 },
+    { state: "Tamil Nadu", searches: 750, zeroResults: 50, avgResults: 700 },
+    { state: "Delhi", searches: 650, zeroResults: 150, avgResults: 500 },
+    { state: "Gujarat", searches: 550, zeroResults: 70, avgResults: 480 },
   ]
+
+  // New analytics data as per PRD requirements
+  const specializationData = [
+    { specialization: "General Medicine", searches: 1200, zeroResults: 60, avgResults: 1140 },
+    { specialization: "Pediatrics", searches: 950, zeroResults: 95, avgResults: 855 },
+    { specialization: "Dermatology", searches: 800, zeroResults: 160, avgResults: 640 },
+    { specialization: "Radiology", searches: 700, zeroResults: 70, avgResults: 630 },
+    { specialization: "Anesthesiology", searches: 650, zeroResults: 65, avgResults: 585 },
+  ]
+
+  const courseData = [
+    { course: "MD/MS", searches: 8500, zeroResults: 425, avgResults: 8075 },
+    { course: "DNB", searches: 4043, zeroResults: 307, avgResults: 3736 },
+  ]
+
+  const categoryData = [
+    { category: "General", searches: 4500, zeroResults: 225, avgResults: 4275 },
+    { category: "OBC", searches: 3800, zeroResults: 190, avgResults: 3610 },
+    { category: "SC", searches: 2500, zeroResults: 125, avgResults: 2375 },
+    { category: "ST", searches: 1200, zeroResults: 60, avgResults: 1140 },
+    { category: "EWS", searches: 543, zeroResults: 132, avgResults: 411 },
+  ]
+
+  const refreshData = () => {
+    setIsLoading(true)
+    // Simulate data refresh
+    setTimeout(() => {
+      setIsLoading(false)
+    }, 1000)
+  }
 
   return (
     <div className="space-y-6">
@@ -82,7 +114,16 @@ export default function AdminDashboard() {
             <option>NEET-PG</option>
             <option>NEET-SS</option>
           </select>
+          <button 
+            onClick={refreshData}
+            disabled={isLoading}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2 hover:bg-blue-700 disabled:opacity-50"
+          >
+            <BarChart3 className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+            {isLoading ? 'Refreshing...' : 'Refresh'}
+          </button>
           <button className="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2 hover:bg-slate-700">
+            <Download className="w-4 h-4" />
             Export Report
           </button>
         </div>
@@ -209,6 +250,146 @@ export default function AdminDashboard() {
               <span className="text-gray-600">Avg Results</span>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Additional Analytics - New Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Top Specializations by Searches */}
+        <div className="bg-white rounded-lg p-6 shadow-sm">
+          <h3 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
+            <GraduationCap className="w-5 h-5" />
+            Top Specializations by Searches
+          </h3>
+          <p className="text-gray-600 text-sm mb-6">Most searched specializations with zero-result analysis</p>
+
+          <div className="space-y-4">
+            {specializationData.map((item, index) => (
+              <div key={index} className="flex items-center gap-4">
+                <div className="w-32 text-sm text-gray-600 truncate">{item.specialization}</div>
+                <div className="flex-1 flex items-center gap-2">
+                  <div className="flex-1 bg-gray-200 rounded-full h-6 relative">
+                    <div
+                      className="bg-blue-600 h-6 rounded-full flex items-center justify-end pr-2"
+                      style={{ width: `${(item.searches / 1200) * 100}%` }}
+                    >
+                      <span className="text-white text-xs font-medium">{item.searches}</span>
+                    </div>
+                  </div>
+                  <div className="w-12 bg-red-500 h-6 rounded-full flex items-center justify-center">
+                    <span className="text-white text-xs font-medium">{item.zeroResults}</span>
+                  </div>
+                  <div className="w-12 bg-green-500 h-6 rounded-full flex items-center justify-center">
+                    <span className="text-white text-xs font-medium">{item.avgResults}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-6 mt-6 text-sm">
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-blue-600 rounded"></div>
+              <span className="text-gray-600">Searches</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-red-500 rounded"></div>
+              <span className="text-gray-600">Zero Results</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-green-500 rounded"></div>
+              <span className="text-gray-600">Avg Results</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Top Categories by Searches */}
+        <div className="bg-white rounded-lg p-6 shadow-sm">
+          <h3 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
+            <Award className="w-5 h-5" />
+            Top Categories by Searches
+          </h3>
+          <p className="text-gray-600 text-sm mb-6">Search distribution by category with zero-result analysis</p>
+
+          <div className="space-y-4">
+            {categoryData.map((item, index) => (
+              <div key={index} className="flex items-center gap-4">
+                <div className="w-20 text-sm text-gray-600">{item.category}</div>
+                <div className="flex-1 flex items-center gap-2">
+                  <div className="flex-1 bg-gray-200 rounded-full h-6 relative">
+                    <div
+                      className="bg-purple-600 h-6 rounded-full flex items-center justify-end pr-2"
+                      style={{ width: `${(item.searches / 4500) * 100}%` }}
+                    >
+                      <span className="text-white text-xs font-medium">{item.searches}</span>
+                    </div>
+                  </div>
+                  <div className="w-12 bg-red-500 h-6 rounded-full flex items-center justify-center">
+                    <span className="text-white text-xs font-medium">{item.zeroResults}</span>
+                  </div>
+                  <div className="w-12 bg-green-500 h-6 rounded-full flex items-center justify-center">
+                    <span className="text-white text-xs font-medium">{item.avgResults}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-6 mt-6 text-sm">
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-purple-600 rounded"></div>
+              <span className="text-gray-600">Searches</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-red-500 rounded"></div>
+              <span className="text-gray-600">Zero Results</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 bg-green-500 rounded"></div>
+              <span className="text-gray-600">Avg Results</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Course Analysis */}
+      <div className="bg-white rounded-lg p-6 shadow-sm">
+        <h3 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
+          <GraduationCap className="w-5 h-5" />
+          Top Specialization by Course
+        </h3>
+        <p className="text-gray-600 text-sm mb-6">Course-wise search distribution with zero-result analysis</p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {courseData.map((item, index) => (
+            <div key={index} className="border border-gray-200 rounded-lg p-4">
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="font-medium text-gray-900">{item.course}</h4>
+                <span className="text-sm text-gray-500">{item.searches} searches</span>
+              </div>
+              
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Total Searches</span>
+                  <span className="font-medium">{item.searches.toLocaleString()}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Zero Results</span>
+                  <span className="font-medium text-red-600">{item.zeroResults}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Avg Results</span>
+                  <span className="font-medium text-green-600">{item.avgResults}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">Success Rate</span>
+                  <span className="font-medium text-blue-600">
+                    {((item.avgResults / item.searches) * 100).toFixed(1)}%
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

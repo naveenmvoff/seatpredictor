@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Download, Search, Filter, Calendar, RefreshCw, FileText } from "lucide-react";
 
 // Interface for user search data
 interface UserSearchData {
@@ -54,9 +55,12 @@ export default function UserSearches() {
   const [dateRange, setDateRange] = useState("Aug 30, 2025 - Sep 29, 2025");
   const [examFilter, setExamFilter] = useState("All Exams");
   const [categoryFilter, setCategoryFilter] = useState("All Categories");
+  const [resultsFilter, setResultsFilter] = useState("All Results");
   const [searchData, setSearchData] = useState<UserSearchData[]>([]);
+  const [filteredData, setFilteredData] = useState<UserSearchData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isExporting, setIsExporting] = useState(false);
 
   const fetchUserData = async (): Promise<UserSearchData[]> => {
     try {
@@ -93,6 +97,7 @@ export default function UserSearches() {
       setError(null);
       const data = await fetchUserData();
       setSearchData(data);
+      setFilteredData(data);
       console.log("Data loaded into state:", data);
     } catch (err) {
       setError(
@@ -106,6 +111,44 @@ export default function UserSearches() {
     }
   };
 
+  // Filter data based on current filters
+  const applyFilters = () => {
+    let filtered = [...searchData];
+
+    // Search query filter
+    if (searchQuery) {
+      filtered = filtered.filter(item =>
+        item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.phone.includes(searchQuery)
+      );
+    }
+
+    // Exam filter
+    if (examFilter !== "All Exams") {
+      filtered = filtered.filter(item => item.exam === examFilter);
+    }
+
+    // Category filter
+    if (categoryFilter !== "All Categories") {
+      filtered = filtered.filter(item => item.category === categoryFilter);
+    }
+
+    // Results filter
+    if (resultsFilter === "Has Results") {
+      filtered = filtered.filter(item => item.results > 0);
+    } else if (resultsFilter === "Zero Results") {
+      filtered = filtered.filter(item => item.results === 0);
+    }
+
+    setFilteredData(filtered);
+  };
+
+  // Apply filters whenever any filter changes
+  useEffect(() => {
+    applyFilters();
+  }, [searchQuery, examFilter, categoryFilter, resultsFilter, searchData]);
+
   // Fetch user data on component mount
   useEffect(() => {
     loadUserData();
@@ -114,6 +157,51 @@ export default function UserSearches() {
   // Refresh function for manual reload
   const refreshData = () => {
     loadUserData();
+  };
+
+  // Export to CSV function
+  const exportToCSV = () => {
+    setIsExporting(true);
+    
+    try {
+      const headers = [
+        "ID", "Name", "Phone", "Email", "Exam", "Rank", "Category", 
+        "State", "Specialization", "Course", "Search Time", "Results"
+      ];
+      
+      const csvContent = [
+        headers.join(","),
+        ...filteredData.map(item => [
+          item.id,
+          `"${item.name}"`,
+          `"${item.phone}"`,
+          `"${item.email}"`,
+          item.exam,
+          item.rank,
+          `"${item.category}"`,
+          `"${item.state}"`,
+          `"${item.specialization}"`,
+          `"${item.course}"`,
+          `"${item.searchTime}"`,
+          item.results
+        ].join(","))
+      ].join("\n");
+
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", `user_searches_${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = "hidden";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error("Error exporting CSV:", error);
+      alert("Error exporting data. Please try again.");
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   return (
@@ -134,11 +222,16 @@ export default function UserSearches() {
             disabled={loading}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <span className={loading ? "animate-spin" : ""}>🔄</span>
+            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
             {loading ? "Loading..." : "Refresh"}
           </button>
-          <button className="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2 hover:bg-slate-700">
-            Export CSV
+          <button 
+            onClick={exportToCSV}
+            disabled={isExporting || filteredData.length === 0}
+            className="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Download className="w-4 h-4" />
+            {isExporting ? "Exporting..." : `Export CSV (${filteredData.length})`}
           </button>
         </div>
       </div>
@@ -146,15 +239,18 @@ export default function UserSearches() {
       {/* Filters Section */}
       <div className="bg-white rounded-lg p-6 shadow-sm">
         <div className="flex items-center gap-2 mb-4">
+          <Filter className="w-5 h-5 text-gray-600" />
           <h2 className="text-lg font-semibold text-gray-900">Filters</h2>
         </div>
         <p className="text-gray-600 text-sm mb-6">
-          Filter search results by various criteria
+          Filter search results by various criteria. Showing {filteredData.length} of {searchData.length} records.
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"></div>
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Search className="w-4 h-4 text-gray-400" />
+            </div>
             <input
               type="text"
               placeholder="Search by name, email, phone..."
@@ -165,9 +261,12 @@ export default function UserSearches() {
           </div>
 
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"></div>
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Calendar className="w-4 h-4 text-gray-400" />
+            </div>
             <input
               type="text"
+              placeholder="Date range"
               value={dateRange}
               onChange={(e) => setDateRange(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -195,6 +294,16 @@ export default function UserSearches() {
             <option>SC</option>
             <option>ST</option>
           </select>
+
+          <select
+            value={resultsFilter}
+            onChange={(e) => setResultsFilter(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option>All Results</option>
+            <option>Has Results</option>
+            <option>Zero Results</option>
+          </select>
         </div>
       </div>
 
@@ -207,7 +316,7 @@ export default function UserSearches() {
           <p className="text-gray-600 text-sm mt-1">
             {loading
               ? "Loading..."
-              : `Showing ${searchData.length} search records`}
+              : `Showing ${filteredData.length} of ${searchData.length} search records`}
           </p>
         </div>
 
@@ -272,17 +381,17 @@ export default function UserSearches() {
                     </div>
                   </td>
                 </tr>
-              ) : searchData.length === 0 ? (
+              ) : filteredData.length === 0 ? (
                 <tr>
                   <td
                     colSpan={10}
                     className="px-6 py-4 text-center text-gray-500"
                   >
-                    No search records found.
+                    {searchData.length === 0 ? "No search records found." : "No records match your filters."}
                   </td>
                 </tr>
               ) : (
-                searchData.map((record) => (
+                filteredData.map((record) => (
                   <tr key={record.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
