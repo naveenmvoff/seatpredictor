@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Save, RotateCcw, CheckCircle, AlertCircle, Calendar, Database, Settings as SettingsIcon, Users, BarChart3 } from "lucide-react";
+import { settingsApi, handleApiError } from "@/lib/api";
 
 interface YearData {
   year: number;
@@ -33,15 +34,54 @@ export default function Settings() {
     { year: 2022, recordCount: 9850, lastUpload: "2024-11-10", isActive: false },
   ]);
 
+  // Load settings from API on component mount
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const data = await settingsApi.getSettings();
+        
+        // Update years data
+        if (data.neet_pg?.years) {
+          setNeetPgYears(data.neet_pg.years);
+          setNeetPgYear(data.neet_pg.active_year?.toString() || "2024");
+        }
+        
+        if (data.neet_ss?.years) {
+          setNeetSsYears(data.neet_ss.years);
+          setNeetSsYear(data.neet_ss.active_year?.toString() || "2024");
+        }
+        
+        // Update system settings
+        if (data.system_settings) {
+          setDataSourcePriority(data.system_settings.data_source_priority || "specific");
+          setAutomaticBackup(data.system_settings.automatic_backup || true);
+          setEmailNotifications(data.system_settings.email_notifications || true);
+        }
+      } catch (error) {
+        console.error('Error loading settings:', handleApiError(error));
+      }
+    };
+
+    loadSettings();
+  }, []);
+
   const handleSaveChanges = async () => {
     setIsSaving(true);
     setSaveStatus("idle");
 
     try {
-      // Simulate API call to save settings
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Save year settings
+      await settingsApi.setActiveYear('NEET-PG', parseInt(neetPgYear));
+      await settingsApi.setActiveYear('NEET-SS', parseInt(neetSsYear));
+      
+      // Update system settings
+      await settingsApi.updateSettings({
+        data_source_priority: dataSourcePriority,
+        automatic_backup: automaticBackup,
+        email_notifications: emailNotifications
+      });
 
-      // Update active years
+      // Update local state
       setNeetPgYears(prev => prev.map(year => ({
         ...year,
         isActive: year.year.toString() === neetPgYear
@@ -56,7 +96,7 @@ export default function Settings() {
       setSaveMessage("Settings saved successfully!");
     } catch (error) {
       setSaveStatus("error");
-      setSaveMessage("Failed to save settings. Please try again.");
+      setSaveMessage(`Failed to save settings: ${handleApiError(error)}`);
     } finally {
       setIsSaving(false);
       setTimeout(() => {
@@ -173,7 +213,7 @@ export default function Settings() {
                         onChange={() => setActiveYear("NEET-PG", yearData.year.toString())}
                         className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
                       />
-                      <div>
+          <div>
                         <div className="font-medium text-gray-900">{yearData.year}</div>
                         <div className="text-sm text-gray-500">
                           {yearData.recordCount.toLocaleString()} records
@@ -225,7 +265,7 @@ export default function Settings() {
                         onChange={() => setActiveYear("NEET-SS", yearData.year.toString())}
                         className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
                       />
-                      <div>
+          <div>
                         <div className="font-medium text-gray-900">{yearData.year}</div>
                         <div className="text-sm text-gray-500">
                           {yearData.recordCount.toLocaleString()} records
@@ -252,35 +292,35 @@ export default function Settings() {
         {/* Data Source Priority */}
         <div className="mt-8 pt-6 border-t border-gray-200">
           <h3 className="text-md font-medium text-gray-900 mb-4">Data Source Priority</h3>
-          <div className="space-y-3">
-            <div className="flex items-center">
-              <input
-                id="latest-data"
-                name="data-priority"
-                type="radio"
-                value="latest"
-                checked={dataSourcePriority === "latest"}
-                onChange={(e) => setDataSourcePriority(e.target.value)}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-              />
+            <div className="space-y-3">
+              <div className="flex items-center">
+                <input
+                  id="latest-data"
+                  name="data-priority"
+                  type="radio"
+                  value="latest"
+                  checked={dataSourcePriority === "latest"}
+                  onChange={(e) => setDataSourcePriority(e.target.value)}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                />
               <label htmlFor="latest-data" className="ml-3 text-sm text-gray-700">
                 Always use latest uploaded data (ignores year selection above)
-              </label>
-            </div>
-            <div className="flex items-center">
-              <input
-                id="specific-year"
-                name="data-priority"
-                type="radio"
-                value="specific"
-                checked={dataSourcePriority === "specific"}
-                onChange={(e) => setDataSourcePriority(e.target.value)}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-              />
+                </label>
+              </div>
+              <div className="flex items-center">
+                <input
+                  id="specific-year"
+                  name="data-priority"
+                  type="radio"
+                  value="specific"
+                  checked={dataSourcePriority === "specific"}
+                  onChange={(e) => setDataSourcePriority(e.target.value)}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                />
               <label htmlFor="specific-year" className="ml-3 text-sm text-gray-700">
-                Use specific year selection above
-              </label>
-            </div>
+                  Use specific year selection above
+                </label>
+              </div>
           </div>
         </div>
       </div>
@@ -339,11 +379,11 @@ export default function Settings() {
             <div className="flex items-center gap-2 mb-2">
               <Database className="w-4 h-4 text-orange-600" />
               <span className="text-sm font-medium text-orange-900">Total Records</span>
-            </div>
+              </div>
             <div className="text-2xl font-bold text-orange-900">
               {(neetPgYears.find(y => y.isActive)?.recordCount || 0) + 
                (neetSsYears.find(y => y.isActive)?.recordCount || 0)}
-            </div>
+              </div>
             <div className="text-xs text-orange-700">
               Currently active
             </div>

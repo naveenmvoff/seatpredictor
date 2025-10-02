@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { BarChart3, TrendingUp, Users, AlertCircle, MapPin, GraduationCap, Award, Download } from "lucide-react"
+import { dashboardApi, handleApiError } from "@/lib/api"
 
 export default function AdminDashboard() {
   const [dateRange, setDateRange] = useState("Aug 30, 2025 - Sep 29, 2025")
@@ -79,12 +80,27 @@ export default function AdminDashboard() {
     { category: "EWS", searches: 543, zeroResults: 132, avgResults: 411 },
   ]
 
-  const refreshData = () => {
+  const refreshData = async () => {
     setIsLoading(true)
-    // Simulate data refresh
-    setTimeout(() => {
+    try {
+      const data = await dashboardApi.getComprehensive()
+      
+      // Update stats with real data
+      if (data.stats) {
+        setStats(prevStats => prevStats.map((stat, index) => {
+          const statKeys = ['total_searches', 'unique_users', 'success_rate', 'zero_results']
+          const key = statKeys[index]
+          return {
+            ...stat,
+            value: data.stats[key]?.toString() || stat.value
+          }
+        }))
+      }
+    } catch (error) {
+      console.error('Error fetching dashboard data:', handleApiError(error))
+    } finally {
       setIsLoading(false)
-    }, 1000)
+    }
   }
 
   return (

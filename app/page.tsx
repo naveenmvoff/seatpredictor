@@ -39,6 +39,17 @@ export default function Home() {
     useState(false);
   const [specializationSearch, setSpecializationSearch] = useState("");
 
+  // Form validation errors
+  const [errors, setErrors] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    rank: "",
+    state: "",
+    specialization: "",
+    qualifyingGroup: "",
+  });
+
   // Drop Down popup Close on outside click
   const stateDropdownRef = useRef<HTMLDivElement>(null);
   const specializationDropdownRef = useRef<HTMLDivElement>(null);
@@ -100,6 +111,55 @@ export default function Home() {
     }
   }, [selectedCourse, formData.qualifyingGroup, dropdownData, activeTab]);
 
+  // Validation function
+  const validateForm = (isNeetPG: boolean) => {
+    const newErrors = {
+      name: "",
+      phone: "",
+      email: "",
+      rank: "",
+      state: "",
+      specialization: "",
+      qualifyingGroup: "",
+    };
+
+    // Common validations for both NEET PG and NEET SS
+    if (!formData.name.trim()) {
+      newErrors.name = "Name is required";
+    }
+    if (!formData.phone.trim()) {
+      newErrors.phone = "Phone number is required";
+    }
+    if (!formData.email.trim()) {
+      newErrors.email = "Email address is required";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Please enter a valid email address";
+    }
+    if (!formData.rank.trim()) {
+      newErrors.rank = "Rank is required";
+    }
+    if (!formData.specialization.trim()) {
+      newErrors.specialization = "Specialization is required";
+    }
+
+    // NEET PG specific validations
+    if (isNeetPG) {
+      if (!formData.state.trim()) {
+        newErrors.state = "State is required";
+      }
+    } else {
+      // NEET SS specific validations
+      if (!formData.qualifyingGroup.trim()) {
+        newErrors.qualifyingGroup = "Qualifying group is required";
+      }
+    }
+
+    setErrors(newErrors);
+    
+    // Return true if no errors
+    return Object.values(newErrors).every(error => error === "");
+  };
+
   useEffect(() => {
     const fetchGroupCategories = async () => {
       try {
@@ -126,6 +186,11 @@ export default function Home() {
 
   const handleSubmitNeetPG = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate form before submission
+    if (!validateForm(true)) {
+      return;
+    }
 
     // Build the API-ready payload for NEET PG
     const NEET_PGData = {
@@ -175,6 +240,11 @@ export default function Home() {
   const handleSubmitNeetSS = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Validate form before submission
+    if (!validateForm(false)) {
+      return;
+    }
+
     // Build the API-ready payload for NEET SS
     const NEET_SSDATA = {
       name: formData.name,
@@ -222,6 +292,10 @@ export default function Home() {
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+    // Clear error when user starts typing
+    if (errors[field as keyof typeof errors]) {
+      setErrors((prev) => ({ ...prev, [field]: "" }));
+    }
   };
 
   useEffect(() => {
@@ -379,45 +453,73 @@ export default function Home() {
 
           {/* Form Fields - Single Horizontal Line */}
           <div className="flex flex-wrap items-center gap-1 mb-6">
-            <input
-              type="text"
-              placeholder="Name"
-              value={formData.name}
-              onChange={(e) => handleInputChange("name", e.target.value)}
-              className="flex-1 min-w-[150px] px-3 py-2  bg-gray-lite border-gray-300 rounded-l-lg focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent"
-            />
+            <div className="flex-1 min-w-[150px]">
+              <input
+                type="text"
+                placeholder="Name"
+                value={formData.name}
+                onChange={(e) => handleInputChange("name", e.target.value)}
+                className={`w-full px-3 py-2 bg-gray-lite border-gray-300 rounded-l-lg focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent ${
+                  errors.name ? "border-red-500" : ""
+                }`}
+              />
+              {errors.name && (
+                <p className="text-red-500 text-xs mt-1">{errors.name}</p>
+              )}
+            </div>
 
-            <input
-              type="tel"
-              placeholder="Phone Number"
-              value={formData.phone}
-              onChange={(e) => handleInputChange("phone", e.target.value)}
-              className="flex-1 min-w-[150px] px-3 py-2 bg-gray-lite border-gray-300 focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent"
-            />
+            <div className="flex-1 min-w-[150px]">
+              <input
+                type="tel"
+                placeholder="Phone Number"
+                value={formData.phone}
+                onChange={(e) => handleInputChange("phone", e.target.value)}
+                className={`w-full px-3 py-2 bg-gray-lite border-gray-300 focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent ${
+                  errors.phone ? "border-red-500" : ""
+                }`}
+              />
+              {errors.phone && (
+                <p className="text-red-500 text-xs mt-1">{errors.phone}</p>
+              )}
+            </div>
 
-            <input
-              type="email"
-              placeholder="Email Address"
-              value={formData.email}
-              onChange={(e) => handleInputChange("email", e.target.value)}
-              className="flex-1 min-w-[150px] px-3 py-2 bg-gray-lite border-gray-300 focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent"
-            />
+            <div className="flex-1 min-w-[150px]">
+              <input
+                type="email"
+                placeholder="Email Address"
+                value={formData.email}
+                onChange={(e) => handleInputChange("email", e.target.value)}
+                className={`w-full px-3 py-2 bg-gray-lite border-gray-300 focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent ${
+                  errors.email ? "border-red-500" : ""
+                }`}
+              />
+              {errors.email && (
+                <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+              )}
+            </div>
 
-            <input
-              type="number"
-              placeholder={
-                activeTab === "NEET PG"
-                  ? "NEET PG 2024 Rank"
-                  : "NEET SS 2024 Rank"
-              }
-              value={formData.rank}
-              onChange={(e) => handleInputChange("rank", e.target.value)}
-              className="flex-1 min-w-[170px] px-3 py-2 bg-gray-lite border-gray-300 
-             focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent
-             [appearance:textfield] 
-             [&::-webkit-outer-spin-button]:appearance-none 
-             [&::-webkit-inner-spin-button]:appearance-none"
-            />
+            <div className="flex-1 min-w-[170px]">
+              <input
+                type="number"
+                placeholder={
+                  activeTab === "NEET PG"
+                    ? "NEET PG 2024 Rank"
+                    : "NEET SS 2024 Rank"
+                }
+                value={formData.rank}
+                onChange={(e) => handleInputChange("rank", e.target.value)}
+                className={`w-full px-3 py-2 bg-gray-lite border-gray-300 
+               focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent
+               [appearance:textfield] 
+               [&::-webkit-outer-spin-button]:appearance-none 
+               [&::-webkit-inner-spin-button]:appearance-none ${
+                 errors.rank ? "border-red-500" : ""
+               }`}
+              />
+              {errors.rank && (
+                <p className="text-red-500 text-xs mt-1">{errors.rank}</p>
+              )}
+            </div>
 
             {activeTab === "NEET PG" ? (
               <>
@@ -428,7 +530,9 @@ export default function Home() {
                 >
                   <div
                     onClick={() => setShowStateDropdown((prev) => !prev)}
-                    className="px-3 py-2 bg-gray-lite border-gray-300 cursor-pointer text-sm focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent"
+                    className={`px-3 py-2 bg-gray-lite border-gray-300 cursor-pointer text-sm focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent ${
+                      errors.state ? "border-red-500" : ""
+                    }`}
                   >
                     {formData.state || stateData.group}
                   </div>
@@ -468,6 +572,9 @@ export default function Home() {
                         ))}
                     </div>
                   )}
+                  {errors.state && (
+                    <p className="text-red-500 text-xs mt-1">{errors.state}</p>
+                  )}
                 </div>
 
                 <div
@@ -478,9 +585,11 @@ export default function Home() {
                     onClick={() =>
                       setShowSpecializationDropdown((prev) => !prev)
                     }
-                    className="px-3 py-2 bg-gray-lite border-gray-300 cursor-pointer text-sm 
+                    className={`px-3 py-2 bg-gray-lite border-gray-300 cursor-pointer text-sm 
              focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent 
-             whitespace-nowrap overflow-hidden truncate"
+             whitespace-nowrap overflow-hidden truncate ${
+               errors.specialization ? "border-red-500" : ""
+             }`}
                     title={formData.specialization || specializationData.group} // Tooltip with full value
                   >
                     {formData.specialization || specializationData.group}
@@ -523,6 +632,9 @@ export default function Home() {
                         ))}
                     </div>
                   )}
+                  {errors.specialization && (
+                    <p className="text-red-500 text-xs mt-1">{errors.specialization}</p>
+                  )}
                 </div>
 
                 <button
@@ -540,7 +652,9 @@ export default function Home() {
                 >
                   <div
                     onClick={() => setShowStateDropdown((prev) => !prev)}
-                    className="px-3 py-2 bg-gray-lite border-gray-300 cursor-pointer text-sm focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent"
+                    className={`px-3 py-2 bg-gray-lite border-gray-300 cursor-pointer text-sm focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent ${
+                      errors.qualifyingGroup ? "border-red-500" : ""
+                    }`}
                   >
                     {formData.qualifyingGroup || ssGroupsData.group}
                   </div>
@@ -578,6 +692,9 @@ export default function Home() {
                         ))}
                     </div>
                   )}
+                  {errors.qualifyingGroup && (
+                    <p className="text-red-500 text-xs mt-1">{errors.qualifyingGroup}</p>
+                  )}
                 </div>
 
                 <div
@@ -588,9 +705,11 @@ export default function Home() {
                     onClick={() =>
                       setShowSpecializationDropdown((prev) => !prev)
                     }
-                    className="px-3 py-2 bg-gray-lite border-gray-300 cursor-pointer text-sm 
+                    className={`px-3 py-2 bg-gray-lite border-gray-300 cursor-pointer text-sm 
              focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent 
-             whitespace-nowrap overflow-hidden truncate"
+             whitespace-nowrap overflow-hidden truncate ${
+               errors.specialization ? "border-red-500" : ""
+             }`}
                     title={formData.specialization || specializationData.group} // Tooltip with full value
                   >
                     {formData.specialization || specializationData.group}
@@ -632,6 +751,9 @@ export default function Home() {
                           </div>
                         ))}
                     </div>
+                  )}
+                  {errors.specialization && (
+                    <p className="text-red-500 text-xs mt-1">{errors.specialization}</p>
                   )}
                 </div>
 

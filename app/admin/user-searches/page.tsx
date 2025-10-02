@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Download, Search, Filter, Calendar, RefreshCw, FileText } from "lucide-react";
+import { userSearchesApi, handleApiError } from "@/lib/api";
 
 // Interface for user search data
 interface UserSearchData {
@@ -65,28 +66,37 @@ export default function UserSearches() {
   const fetchUserData = async (): Promise<UserSearchData[]> => {
     try {
       console.log("Fetching user data from API...");
-      const response = await fetch("http://127.0.0.1:8000/admin/user-data", {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
+      const data = await userSearchesApi.getEnhanced({
+        page: 1,
+        page_size: 50,
+        search: searchQuery,
+        exam_filter: examFilter,
+        category_filter: categoryFilter,
+        results_filter: resultsFilter
       });
-
-      if (!response.ok)
-        throw new Error(`HTTP error! status: ${response.status}`);
-
-      const data = await response.json();
 
       console.log("Fetched user data:==========", data);
 
       // Transform data and add resultsBadge
-      return data.map((item: UserSearchData) => ({
-        ...item,
-        resultsBadge:
-          item.results === 0
-            ? "bg-red-100 text-red-800"
-            : "bg-green-100 text-green-800",
+      return data.data.map((item: any) => ({
+        id: item.seqno,
+        name: item.name,
+        phone: item.phone_number || "",
+        email: item.email || "",
+        exam: item.exam_type || "Unknown",
+        rank: item.rank_no?.toString() || "",
+        category: item.category || "",
+        state: item.state || "",
+        specialization: item.specialization || "",
+        course: item.qualifying_group_or_course || "",
+        searchTime: item.search_time
+          ? new Date(item.search_time).toLocaleString()
+          : "",
+        results: item.results_count || 0,
+        resultsBadge: item.has_results ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800",
       }));
     } catch (error) {
-      console.error("Error fetching user data:", error);
+      console.error("Error fetching user data:", handleApiError(error));
       return [];
     }
   };
@@ -160,45 +170,19 @@ export default function UserSearches() {
   };
 
   // Export to CSV function
-  const exportToCSV = () => {
+  const exportToCSV = async () => {
     setIsExporting(true);
     
     try {
-      const headers = [
-        "ID", "Name", "Phone", "Email", "Exam", "Rank", "Category", 
-        "State", "Specialization", "Course", "Search Time", "Results"
-      ];
-      
-      const csvContent = [
-        headers.join(","),
-        ...filteredData.map(item => [
-          item.id,
-          `"${item.name}"`,
-          `"${item.phone}"`,
-          `"${item.email}"`,
-          item.exam,
-          item.rank,
-          `"${item.category}"`,
-          `"${item.state}"`,
-          `"${item.specialization}"`,
-          `"${item.course}"`,
-          `"${item.searchTime}"`,
-          item.results
-        ].join(","))
-      ].join("\n");
-
-      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-      const link = document.createElement("a");
-      const url = URL.createObjectURL(blob);
-      link.setAttribute("href", url);
-      link.setAttribute("download", `user_searches_${new Date().toISOString().split('T')[0]}.csv`);
-      link.style.visibility = "hidden";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      await userSearchesApi.exportCsv({
+        search_query: searchQuery,
+        exam_filter: examFilter,
+        category_filter: categoryFilter,
+        results_filter: resultsFilter
+      });
     } catch (error) {
-      console.error("Error exporting CSV:", error);
-      alert("Error exporting data. Please try again.");
+      console.error("Error exporting CSV:", handleApiError(error));
+      alert(`Error exporting data: ${handleApiError(error)}`);
     } finally {
       setIsExporting(false);
     }

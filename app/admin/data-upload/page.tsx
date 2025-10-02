@@ -1,8 +1,9 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Download, AlertCircle, CheckCircle, Upload, FileText, Calendar } from "lucide-react"
+import { uploadApi, handleApiError } from "@/lib/api"
 
 interface UploadError {
   row: number
@@ -46,7 +47,18 @@ export default function DataUpload() {
     "CANDIDATE_CATEGORY"
   ]
 
-  const uploadHistory: UploadHistory[] = [
+  const [uploadHistory, setUploadHistory] = useState<UploadHistory[]>([])
+
+  // Fetch upload history from API
+  useEffect(() => {
+    const fetchUploadHistory = async () => {
+      try {
+        const data = await uploadApi.getHistory()
+        setUploadHistory(data.upload_history || [])
+      } catch (error) {
+        console.error('Error fetching upload history:', handleApiError(error))
+        // Fallback to mock data
+        setUploadHistory([
     {
       id: 1,
       fileName: "NEET_PG_2024_Round1.csv",
@@ -66,30 +78,13 @@ export default function DataUpload() {
       date: "2024-12-10",
       status: "Success",
       statusBadge: "bg-green-100 text-green-800",
-    },
-    {
-      id: 3,
-      fileName: "NEET_PG_2023_Final.csv",
-      exam: "NEET-PG",
-      year: "2023",
-      records: "42,180",
-      date: "2024-12-05",
-      status: "Success",
-      statusBadge: "bg-green-100 text-green-800",
-    },
-    {
-      id: 4,
-      fileName: "NEET_SS_2023_Corrected.xlsx",
-      exam: "NEET-SS",
-      year: "2023",
-      records: "0",
-      date: "2024-12-01",
-      status: "Failed",
-      statusBadge: "bg-red-100 text-red-800",
-      errorCount: 15,
-      errorReportUrl: "/api/error-reports/neet_ss_2023_errors.csv"
-    },
-  ]
+          }
+        ])
+      }
+    }
+    
+    fetchUploadHistory()
+  }, [])
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -154,31 +149,22 @@ export default function DataUpload() {
         return
       }
 
-      // Simulate upload process
-      const formData = new FormData()
-      formData.append('file', selectedFile)
-      formData.append('exam_type', selectedExamType)
-      formData.append('year', selectedYear)
-
-      // Here you would make the actual API call
-      // const response = await fetch('/api/upload-excel/', {
-      //   method: 'POST',
-      //   body: formData
-      // })
-
-      // Simulate successful upload
-      setTimeout(() => {
-        setUploadStatus("success")
-        setUploadMessage(`Successfully uploaded ${selectedFile.name}. 45,230 records imported.`)
-        setSelectedFile(null)
-        setSelectedExamType("")
-        setSelectedYear("")
-        setIsUploading(false)
-      }, 2000)
+      // Upload to backend API
+      const result = await uploadApi.uploadFile(selectedFile, selectedExamType, selectedYear)
+      
+      setUploadStatus("success")
+      setUploadMessage(`Successfully uploaded ${selectedFile.name}. ${result.created_count} records imported.`)
+      setSelectedFile(null)
+      setSelectedExamType("")
+      setSelectedYear("")
+      
+      // Refresh upload history
+      const historyData = await uploadApi.getHistory()
+      setUploadHistory(historyData.upload_history || [])
 
     } catch (error) {
       setUploadStatus("error")
-      setUploadMessage("Upload failed. Please try again.")
+      setUploadMessage(`Upload failed: ${handleApiError(error)}`)
       setIsUploading(false)
     }
   }
@@ -312,11 +298,11 @@ export default function DataUpload() {
         )}
 
         <div className="flex items-center gap-4">
-          <button
-            onClick={handleUpload}
+        <button
+          onClick={handleUpload}
             disabled={!selectedFile || !selectedExamType || !selectedYear || isUploading}
-            className="bg-slate-800 text-white px-6 py-2 rounded-lg hover:bg-slate-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2"
-          >
+          className="bg-slate-800 text-white px-6 py-2 rounded-lg hover:bg-slate-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2"
+        >
             {isUploading ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
@@ -325,7 +311,7 @@ export default function DataUpload() {
             ) : (
               <>
                 <Upload className="w-4 h-4" />
-                Upload File
+          Upload File
               </>
             )}
           </button>
@@ -337,7 +323,7 @@ export default function DataUpload() {
             >
               <Download className="w-4 h-4" />
               Download Error Report
-            </button>
+        </button>
           )}
         </div>
       </div>
@@ -376,7 +362,7 @@ export default function DataUpload() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center gap-2">
                       <FileText className="w-4 h-4 text-gray-400" />
-                      <div className="text-sm font-medium text-gray-900">{upload.fileName}</div>
+                    <div className="text-sm font-medium text-gray-900">{upload.fileName}</div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
