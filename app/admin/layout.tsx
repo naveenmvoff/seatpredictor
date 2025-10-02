@@ -108,32 +108,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             </div>
           ))}
         </div>
-
-        {/* Quick Stats */}
-        <div className="p-4 border-t border-slate-700">
-          <div className="bg-slate-700 rounded-lg p-3 mb-4">
-            <h3 className="text-xs font-medium text-slate-300 mb-2">Quick Stats</h3>
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <div className="flex items-center gap-1">
-                <Database className="w-3 h-3 text-blue-400" />
-                <span className="text-slate-300">45.2K</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <Users className="w-3 h-3 text-green-400" />
-                <span className="text-slate-300">8.2K</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <FileText className="w-3 h-3 text-purple-400" />
-                <span className="text-slate-300">12.5K</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <TrendingUp className="w-3 h-3 text-orange-400" />
-                <span className="text-slate-300">94.2%</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
+        
         {/* User Info */}
         <div className="p-4 border-t border-slate-700">
           <div className="flex items-center space-x-3 mb-3">

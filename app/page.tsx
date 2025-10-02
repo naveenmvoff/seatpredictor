@@ -652,9 +652,11 @@ export default function Home() {
                 >
                   <div
                     onClick={() => setShowStateDropdown((prev) => !prev)}
-                    className={`px-3 py-2 bg-gray-lite border-gray-300 cursor-pointer text-sm focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent ${
-                      errors.qualifyingGroup ? "border-red-500" : ""
-                    }`}
+                    className={`px-3 py-2 bg-gray-lite border-gray-300 cursor-pointer text-sm focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent 
+             whitespace-nowrap overflow-hidden truncate ${
+               errors.qualifyingGroup ? "border-red-500" : ""
+             }`}
+                    title={formData.qualifyingGroup || ssGroupsData.group} // Tooltip with full value
                   >
                     {formData.qualifyingGroup || ssGroupsData.group}
                   </div>
@@ -756,19 +758,6 @@ export default function Home() {
                     <p className="absolute top-full left-0 text-red-500 text-xs mt-1 whitespace-nowrap z-10 bg-white px-1 rounded shadow-sm">{errors.specialization}</p>
                   )}
                 </div>
-
-                {/* <select
-                  value={formData.qualifyingGroup}
-                  onChange={(e) =>
-                    handleInputChange("qualifyingGroup", e.target.value)
-                  }
-                  className="flex-1 min-w-[150px] px-3 py-2 bg-gray-lite border-gray-300 focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent"
-                >
-                  <option value="">Qualifying Group</option>
-                  <option value="Group A">Group A</option>
-                  <option value="Group B">Group B</option>
-                  <option value="Group C">Group C</option>
-                </select> */}
 
                 <button
                   type="submit"
