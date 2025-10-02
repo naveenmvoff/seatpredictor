@@ -127,6 +127,8 @@ export default function Results() {
   useEffect(() => {
     if (
       formData?.specialization &&
+      dropdownData.length > 0 && // Only clear after dropdown data is loaded
+      specializationData.values.length > 0 && // And specialization options are available
       !specializationData.values.includes(formData.specialization)
     ) {
       setFormData((prev) => (prev ? { ...prev, specialization: "" } : prev));
@@ -462,7 +464,7 @@ export default function Results() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 {userData.exam === "NEET PG"
-                  ? "NEET PG 2024 Rank"
+                  ? "NEET PG Rank"
                   : "NEET SS 2024 Rank"}
               </label>
               {/* <input
@@ -474,7 +476,7 @@ export default function Results() {
 
               <input
                 type="number"
-                placeholder={"NEET PG 2024 Rank"}
+                placeholder={"NEET PG Rank"}
                 value={formData.rank}
                 onChange={(e) => handleInputChange("rank", e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-1 focus:ring-slate-700 focus:border-transparent [appearance:textfield]              [&::-webkit-outer-spin-button]:appearance-none 
@@ -577,11 +579,13 @@ export default function Results() {
                 Specialization
               </label>
               <div ref={specializationDropdownRef} className="relative w-full">
-                <div
-                  onClick={() => setShowSpecializationDropdown((prev) => !prev)}
-                  className="px-3 py-2 bg-white border border-gray-300 rounded-md cursor-pointer text-sm focus:outline-none focus:ring-1 focus:ring-slate-700 focus:border-transparent"
-                  title={formData.specialization || specializationData.group}
-                >
+                 <div
+                   onClick={() => setShowSpecializationDropdown((prev) => !prev)}
+                   className={`px-3 py-2 bg-white border rounded-md cursor-pointer text-sm focus:outline-none focus:ring-1 focus:ring-slate-700 focus:border-transparent whitespace-nowrap overflow-hidden truncate ${
+                     !formData.specialization ? "border-red-500" : "border-gray-300"
+                   }`}
+                   title={formData.specialization || specializationData.group}
+                 >
                   {formData.specialization || specializationData.group}
                 </div>
 

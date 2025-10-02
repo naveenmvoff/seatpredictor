@@ -329,7 +329,7 @@ export default function DataUpload() {
       </div>
 
       {/* Recent Uploads */}
-      <div className="bg-white rounded-lg shadow-sm">
+      {/* <div className="bg-white rounded-lg shadow-sm">
         <div className="p-6 border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900">Recent Uploads</h2>
           <p className="text-gray-600 text-sm mt-1">History of previously uploaded files</p>
@@ -418,7 +418,7 @@ export default function DataUpload() {
             </tbody>
           </table>
         </div>
-      </div>
+      </div> */}
 
       {/* Error Report Modal */}
       {showErrorReport && (

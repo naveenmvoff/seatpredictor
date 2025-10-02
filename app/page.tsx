@@ -459,13 +459,10 @@ export default function Home() {
                 placeholder="Name"
                 value={formData.name}
                 onChange={(e) => handleInputChange("name", e.target.value)}
-                className={`w-full px-3 py-2 bg-gray-lite border-gray-300 rounded-l-lg focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent ${
-                  errors.name ? "border-red-500" : ""
+                className={`w-full px-3 py-2 bg-gray-lite rounded-l-lg focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent border-2 ${
+                  errors.name ? "border-red-500" : "border-gray-300"
                 }`}
               />
-              {errors.name && (
-                <p className="absolute top-full left-0 text-red-500 text-xs mt-1 whitespace-nowrap z-10 bg-white px-1 rounded shadow-sm">{errors.name}</p>
-              )}
             </div>
 
             <div className="flex-1 min-w-[150px] relative">
@@ -474,13 +471,10 @@ export default function Home() {
                 placeholder="Phone Number"
                 value={formData.phone}
                 onChange={(e) => handleInputChange("phone", e.target.value)}
-                className={`w-full px-3 py-2 bg-gray-lite border-gray-300 focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent ${
-                  errors.phone ? "border-red-500" : ""
+                className={`w-full px-3 py-2 bg-gray-lite focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent border-2 ${
+                  errors.phone ? "border-red-500" : "border-gray-300"
                 }`}
               />
-              {errors.phone && (
-                <p className="absolute top-full left-0 text-red-500 text-xs mt-1 whitespace-nowrap z-10 bg-white px-1 rounded shadow-sm">{errors.phone}</p>
-              )}
             </div>
 
             <div className="flex-1 min-w-[150px] relative">
@@ -489,13 +483,10 @@ export default function Home() {
                 placeholder="Email Address"
                 value={formData.email}
                 onChange={(e) => handleInputChange("email", e.target.value)}
-                className={`w-full px-3 py-2 bg-gray-lite border-gray-300 focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent ${
-                  errors.email ? "border-red-500" : ""
+                className={`w-full px-3 py-2 bg-gray-lite focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent border-2 ${
+                  errors.email ? "border-red-500" : "border-gray-300"
                 }`}
               />
-              {errors.email && (
-                <p className="absolute top-full left-0 text-red-500 text-xs mt-1 whitespace-nowrap z-10 bg-white px-1 rounded shadow-sm">{errors.email}</p>
-              )}
             </div>
 
             <div className="flex-1 min-w-[170px] relative">
@@ -503,22 +494,19 @@ export default function Home() {
                 type="number"
                 placeholder={
                   activeTab === "NEET PG"
-                    ? "NEET PG 2024 Rank"
-                    : "NEET SS 2024 Rank"
+                    ? "NEET PG Rank"
+                    : "NEET SS Rank"
                 }
                 value={formData.rank}
                 onChange={(e) => handleInputChange("rank", e.target.value)}
-                className={`w-full px-3 py-2 bg-gray-lite border-gray-300 
+                className={`w-full px-3 py-2 bg-gray-lite 
                focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent
                [appearance:textfield] 
                [&::-webkit-outer-spin-button]:appearance-none 
-               [&::-webkit-inner-spin-button]:appearance-none ${
-                 errors.rank ? "border-red-500" : ""
+               [&::-webkit-inner-spin-button]:appearance-none border-2 ${
+                 errors.rank ? "border-red-500" : "border-gray-300"
                }`}
               />
-              {errors.rank && (
-                <p className="absolute top-full left-0 text-red-500 text-xs mt-1 whitespace-nowrap z-10 bg-white px-1 rounded shadow-sm">{errors.rank}</p>
-              )}
             </div>
 
             {activeTab === "NEET PG" ? (
@@ -530,8 +518,8 @@ export default function Home() {
                 >
                   <div
                     onClick={() => setShowStateDropdown((prev) => !prev)}
-                    className={`px-3 py-2 bg-gray-lite border-gray-300 cursor-pointer text-sm focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent ${
-                      errors.state ? "border-red-500" : ""
+                    className={`px-3 py-2 bg-gray-lite cursor-pointer text-sm focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent border-2 ${
+                      errors.state ? "border-red-500" : "border-gray-300"
                     }`}
                   >
                     {formData.state || stateData.group}
@@ -572,9 +560,6 @@ export default function Home() {
                         ))}
                     </div>
                   )}
-                  {errors.state && (
-                    <p className="absolute top-full left-0 text-red-500 text-xs mt-1 whitespace-nowrap z-10 bg-white px-1 rounded shadow-sm">{errors.state}</p>
-                  )}
                 </div>
 
                 <div
@@ -587,8 +572,8 @@ export default function Home() {
                     }
                     className={`px-3 py-2 bg-gray-lite border-gray-300 cursor-pointer text-sm 
              focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent 
-             whitespace-nowrap overflow-hidden truncate ${
-               errors.specialization ? "border-red-500" : ""
+             whitespace-nowrap overflow-hidden truncate border-2 ${
+               errors.specialization ? "border-red-500" : "border-gray-300"
              }`}
                     title={formData.specialization || specializationData.group} // Tooltip with full value
                   >
@@ -632,9 +617,6 @@ export default function Home() {
                         ))}
                     </div>
                   )}
-                  {errors.specialization && (
-                    <p className="absolute top-full left-0 text-red-500 text-xs mt-1 whitespace-nowrap z-10 bg-white px-1 rounded shadow-sm">{errors.specialization}</p>
-                  )}
                 </div>
 
                 <button
@@ -652,9 +634,9 @@ export default function Home() {
                 >
                   <div
                     onClick={() => setShowStateDropdown((prev) => !prev)}
-                    className={`px-3 py-2 bg-gray-lite border-gray-300 cursor-pointer text-sm focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent 
-             whitespace-nowrap overflow-hidden truncate ${
-               errors.qualifyingGroup ? "border-red-500" : ""
+                    className={`px-3 py-2 bg-gray-lite cursor-pointer text-sm focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent 
+             whitespace-nowrap overflow-hidden truncate border-2 ${
+               errors.qualifyingGroup ? "border-red-500" : "border-gray-300"
              }`}
                     title={formData.qualifyingGroup || ssGroupsData.group} // Tooltip with full value
                   >
@@ -709,8 +691,8 @@ export default function Home() {
                     }
                     className={`px-3 py-2 bg-gray-lite border-gray-300 cursor-pointer text-sm 
              focus:outline-none focus:ring-1 focus:ring-radio-blue focus:border-transparent 
-             whitespace-nowrap overflow-hidden truncate ${
-               errors.specialization ? "border-red-500" : ""
+             whitespace-nowrap overflow-hidden truncate border-2 ${
+               errors.specialization ? "border-red-500" : "border-gray-300"
              }`}
                     title={formData.specialization || specializationData.group} // Tooltip with full value
                   >
@@ -753,9 +735,6 @@ export default function Home() {
                           </div>
                         ))}
                     </div>
-                  )}
-                  {errors.specialization && (
-                    <p className="absolute top-full left-0 text-red-500 text-xs mt-1 whitespace-nowrap z-10 bg-white px-1 rounded shadow-sm">{errors.specialization}</p>
                   )}
                 </div>
 

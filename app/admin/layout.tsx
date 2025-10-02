@@ -111,7 +111,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         
         {/* User Info */}
         <div className="p-4 border-t border-slate-700">
-          <div className="flex items-center space-x-3 mb-3">
+          {/* <div className="flex items-center space-x-3 mb-3">
             <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
               <User className="w-5 h-5 text-white" />
             </div>
@@ -125,13 +125,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 <span className="text-xs text-green-400">Online</span>
               </div>
             </div>
-          </div>
+          </div> */}
           
           <div className="flex items-center gap-2">
-            <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-xs text-slate-300 hover:bg-slate-700 rounded-lg transition-colors">
-              <Bell className="w-4 h-4" />
-              Notifications
-            </button>
             <button 
               onClick={handleLogout}
               className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-xs text-red-400 hover:bg-red-900/20 rounded-lg transition-colors"
@@ -155,15 +151,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <h1 className="text-xl font-semibold text-gray-900">Seat Predictor Admin Portal</h1>
-              <div className="flex items-center gap-2 text-sm text-gray-500">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span>System Online</span>
-              </div>
             </div>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2 text-sm text-gray-600">
-                <Bell className="w-4 h-4" />
-                <span>3</span>
               </div>
               <div className="text-sm text-gray-600">Welcome, Admin</div>
             </div>
