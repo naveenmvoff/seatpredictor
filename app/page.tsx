@@ -452,8 +452,8 @@ export default function Home() {
           )}
 
           {/* Form Fields - Single Horizontal Line */}
-          <div className="flex flex-wrap items-center gap-1 mb-6">
-            <div className="flex-1 min-w-[150px]">
+          <div className="flex flex-wrap items-start gap-1 mb-12">
+            <div className="flex-1 min-w-[150px] relative">
               <input
                 type="text"
                 placeholder="Name"
@@ -464,11 +464,11 @@ export default function Home() {
                 }`}
               />
               {errors.name && (
-                <p className="text-red-500 text-xs mt-1">{errors.name}</p>
+                <p className="absolute top-full left-0 text-red-500 text-xs mt-1 whitespace-nowrap z-10 bg-white px-1 rounded shadow-sm">{errors.name}</p>
               )}
             </div>
 
-            <div className="flex-1 min-w-[150px]">
+            <div className="flex-1 min-w-[150px] relative">
               <input
                 type="tel"
                 placeholder="Phone Number"
@@ -479,11 +479,11 @@ export default function Home() {
                 }`}
               />
               {errors.phone && (
-                <p className="text-red-500 text-xs mt-1">{errors.phone}</p>
+                <p className="absolute top-full left-0 text-red-500 text-xs mt-1 whitespace-nowrap z-10 bg-white px-1 rounded shadow-sm">{errors.phone}</p>
               )}
             </div>
 
-            <div className="flex-1 min-w-[150px]">
+            <div className="flex-1 min-w-[150px] relative">
               <input
                 type="email"
                 placeholder="Email Address"
@@ -494,11 +494,11 @@ export default function Home() {
                 }`}
               />
               {errors.email && (
-                <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+                <p className="absolute top-full left-0 text-red-500 text-xs mt-1 whitespace-nowrap z-10 bg-white px-1 rounded shadow-sm">{errors.email}</p>
               )}
             </div>
 
-            <div className="flex-1 min-w-[170px]">
+            <div className="flex-1 min-w-[170px] relative">
               <input
                 type="number"
                 placeholder={
@@ -517,7 +517,7 @@ export default function Home() {
                }`}
               />
               {errors.rank && (
-                <p className="text-red-500 text-xs mt-1">{errors.rank}</p>
+                <p className="absolute top-full left-0 text-red-500 text-xs mt-1 whitespace-nowrap z-10 bg-white px-1 rounded shadow-sm">{errors.rank}</p>
               )}
             </div>
 
@@ -538,7 +538,7 @@ export default function Home() {
                   </div>
 
                   {showStateDropdown && (
-                    <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg z-10 max-h-60 overflow-y-auto">
+                    <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg z-20 max-h-60 overflow-y-auto">
                       {/* Search bar */}
                       <div className="p-2 border-b border-gray-200">
                         <input
@@ -573,7 +573,7 @@ export default function Home() {
                     </div>
                   )}
                   {errors.state && (
-                    <p className="text-red-500 text-xs mt-1">{errors.state}</p>
+                    <p className="absolute top-full left-0 text-red-500 text-xs mt-1 whitespace-nowrap z-10 bg-white px-1 rounded shadow-sm">{errors.state}</p>
                   )}
                 </div>
 
@@ -596,7 +596,7 @@ export default function Home() {
                   </div>
 
                   {showSpecializationDropdown && (
-                    <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg z-10 max-h-60 overflow-y-auto">
+                    <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg z-20 max-h-60 overflow-y-auto">
                       {/* Search bar */}
                       <div className="p-2 border-b border-gray-200">
                         <input
@@ -633,7 +633,7 @@ export default function Home() {
                     </div>
                   )}
                   {errors.specialization && (
-                    <p className="text-red-500 text-xs mt-1">{errors.specialization}</p>
+                    <p className="absolute top-full left-0 text-red-500 text-xs mt-1 whitespace-nowrap z-10 bg-white px-1 rounded shadow-sm">{errors.specialization}</p>
                   )}
                 </div>
 
@@ -660,7 +660,7 @@ export default function Home() {
                   </div>
 
                   {showStateDropdown && (
-                    <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg z-10 max-h-60 overflow-y-auto">
+                    <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg z-20 max-h-60 overflow-y-auto">
                       {/* Search bar */}
                       <div className="p-2 border-b border-gray-200">
                         <input
@@ -693,7 +693,7 @@ export default function Home() {
                     </div>
                   )}
                   {errors.qualifyingGroup && (
-                    <p className="text-red-500 text-xs mt-1">{errors.qualifyingGroup}</p>
+                    <p className="absolute top-full left-0 text-red-500 text-xs mt-1 whitespace-nowrap z-10 bg-white px-1 rounded shadow-sm">{errors.qualifyingGroup}</p>
                   )}
                 </div>
 
@@ -716,7 +716,7 @@ export default function Home() {
                   </div>
 
                   {showSpecializationDropdown && (
-                    <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg z-10 max-h-60 overflow-y-auto">
+                    <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg z-20 max-h-60 overflow-y-auto">
                       {/* Search bar */}
                       <div className="p-2 border-b border-gray-200">
                         <input
@@ -753,7 +753,7 @@ export default function Home() {
                     </div>
                   )}
                   {errors.specialization && (
-                    <p className="text-red-500 text-xs mt-1">{errors.specialization}</p>
+                    <p className="absolute top-full left-0 text-red-500 text-xs mt-1 whitespace-nowrap z-10 bg-white px-1 rounded shadow-sm">{errors.specialization}</p>
                   )}
                 </div>
 
