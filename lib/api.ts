@@ -1,6 +1,6 @@
 // API Configuration for Seat Predictor Admin Panel
 
-const API_BASE_URL = 'http://127.0.0.1:8000/api';
+const API_BASE_URL = "http://127.0.0.1:8000/api";
 
 // API Endpoints
 export const API_ENDPOINTS = {
@@ -47,11 +47,11 @@ export class ApiClient {
 
   static getHeaders(includeAuth: boolean = true) {
     const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     };
 
     if (includeAuth && this.token) {
-      headers['Authorization'] = `Bearer ${this.token}`;
+      headers["Authorization"] = `Bearer ${this.token}`;
     }
 
     return headers;
@@ -59,7 +59,7 @@ export class ApiClient {
 
   static async get(url: string, includeAuth: boolean = true) {
     const response = await fetch(url, {
-      method: 'GET',
+      method: "GET",
       headers: this.getHeaders(includeAuth),
     });
 
@@ -72,49 +72,61 @@ export class ApiClient {
 
   static async post(url: string, data: any, includeAuth: boolean = true) {
     const response = await fetch(url, {
-      method: 'POST',
+      method: "POST",
       headers: this.getHeaders(includeAuth),
       body: JSON.stringify(data),
     });
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+      throw new Error(
+        errorData.detail || `HTTP error! status: ${response.status}`
+      );
     }
 
     return response.json();
   }
 
-  static async postFormData(url: string, formData: FormData, includeAuth: boolean = true) {
+  static async postFormData(
+    url: string,
+    formData: FormData,
+    includeAuth: boolean = true
+  ) {
     const headers: Record<string, string> = {};
 
     if (includeAuth && this.token) {
-      headers['Authorization'] = `Bearer ${this.token}`;
+      headers["Authorization"] = `Bearer ${this.token}`;
     }
 
     const response = await fetch(url, {
-      method: 'POST',
+      method: "POST",
       headers,
       body: formData,
     });
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+      throw new Error(
+        errorData.detail || `HTTP error! status: ${response.status}`
+      );
     }
 
     return response.json();
   }
 
-  static async downloadFile(url: string, filename: string, includeAuth: boolean = true) {
+  static async downloadFile(
+    url: string,
+    filename: string,
+    includeAuth: boolean = true
+  ) {
     const headers: Record<string, string> = {};
 
     if (includeAuth && this.token) {
-      headers['Authorization'] = `Bearer ${this.token}`;
+      headers["Authorization"] = `Bearer ${this.token}`;
     }
 
     const response = await fetch(url, {
-      method: 'GET',
+      method: "GET",
       headers,
     });
 
@@ -124,7 +136,7 @@ export class ApiClient {
 
     const blob = await response.blob();
     const downloadUrl = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = downloadUrl;
     link.download = filename;
     document.body.appendChild(link);
@@ -136,116 +148,132 @@ export class ApiClient {
 
 // Dashboard API Functions
 export const dashboardApi = {
-  getStats: (days: number = 30) => 
+  getStats: (days: number = 30) =>
     ApiClient.get(`${API_ENDPOINTS.DASHBOARD_STATS}?days=${days}`),
-  
-  getComprehensive: () => 
-    ApiClient.get(API_ENDPOINTS.DASHBOARD_COMPREHENSIVE),
-  
-  getRankBands: (days: number = 30) => 
+
+  getComprehensive: () => ApiClient.get(API_ENDPOINTS.DASHBOARD_COMPREHENSIVE),
+
+  getRankBands: (days: number = 30) =>
     ApiClient.get(`${API_ENDPOINTS.DASHBOARD_RANK_BANDS}?days=${days}`),
-  
-  getStates: (days: number = 30) => 
+
+  getStates: (days: number = 30) =>
     ApiClient.get(`${API_ENDPOINTS.DASHBOARD_STATES}?days=${days}`),
-  
-  getSpecializations: (days: number = 30) => 
+
+  getSpecializations: (days: number = 30) =>
     ApiClient.get(`${API_ENDPOINTS.DASHBOARD_SPECIALIZATIONS}?days=${days}`),
-  
-  getCategories: (days: number = 30) => 
+
+  getCategories: (days: number = 30) =>
     ApiClient.get(`${API_ENDPOINTS.DASHBOARD_CATEGORIES}?days=${days}`),
-  
-  getCourses: (days: number = 30) => 
+
+  getCourses: (days: number = 30) =>
     ApiClient.get(`${API_ENDPOINTS.DASHBOARD_COURSES}?days=${days}`),
 };
 
 // Upload API Functions
 export const uploadApi = {
-  uploadFile: (file: File, examType: string, year: string) => {
+  uploadFile: async (file: File, exam?: string, year?: string) => {
     const formData = new FormData();
-    formData.append('file', file);
-    formData.append('exam_type', examType);
-    formData.append('year', year);
-    return ApiClient.postFormData(API_ENDPOINTS.UPLOAD_ENHANCED, formData);
+    formData.append("file", file);
+    if (exam) formData.append("exam", exam);
+    if (year) formData.append("year", year);
+    const response = await fetch("http://localhost:8000/api/upload-excel/", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || "Upload failed");
+    }
+
+    return response.json();
   },
-  
-  getHistory: () => 
-    ApiClient.get(API_ENDPOINTS.UPLOAD_HISTORY),
-  
-  downloadErrorReport: (filename: string) => 
-    ApiClient.downloadFile(`${API_ENDPOINTS.ERROR_REPORT}${filename}/`, filename),
+
+  getHistory: async () => {
+    // For now mock history (you can later connect to your backend if you expose an endpoint for history)
+    return {
+      upload_history: [],
+    };
+  },
 };
 
 // User Searches API Functions
 export const userSearchesApi = {
-  getEnhanced: (params: {
-    page?: number;
-    page_size?: number;
-    search?: string;
-    exam_filter?: string;
-    category_filter?: string;
-    state_filter?: string;
-    results_filter?: string;
-    date_from?: string;
-    date_to?: string;
-    sort_by?: string;
-  } = {}) => {
+  getEnhanced: (
+    params: {
+      page?: number;
+      page_size?: number;
+      search?: string;
+      exam_filter?: string;
+      category_filter?: string;
+      state_filter?: string;
+      results_filter?: string;
+      date_from?: string;
+      date_to?: string;
+      sort_by?: string;
+    } = {}
+  ) => {
     const searchParams = new URLSearchParams();
     Object.entries(params).forEach(([key, value]) => {
-      if (value !== undefined && value !== '') {
+      if (value !== undefined && value !== "") {
         searchParams.append(key, value.toString());
       }
     });
-    return ApiClient.get(`${API_ENDPOINTS.USER_SEARCHES_ENHANCED}?${searchParams.toString()}`);
+    return ApiClient.get(
+      `${API_ENDPOINTS.USER_SEARCHES_ENHANCED}?${searchParams.toString()}`
+    );
   },
-  
-  getAnalytics: (days: number = 30) => 
+
+  getAnalytics: (days: number = 30) =>
     ApiClient.get(`${API_ENDPOINTS.USER_SEARCHES_ANALYTICS}?days=${days}`),
-  
-  exportCsv: (filters: Record<string, any>) => 
+
+  exportCsv: (filters: Record<string, any>) =>
     ApiClient.post(API_ENDPOINTS.USER_SEARCHES_EXPORT, { filters }),
-  
-  getInsights: (days: number = 30) => 
+
+  getInsights: (days: number = 30) =>
     ApiClient.get(`${API_ENDPOINTS.USER_SEARCHES_INSIGHTS}?days=${days}`),
 };
 
 // Settings API Functions
 export const settingsApi = {
-  getSettings: () => 
-    ApiClient.get(API_ENDPOINTS.SYSTEM_SETTINGS),
-  
-  setActiveYear: (examType: string, year: number) => 
-    ApiClient.post(API_ENDPOINTS.SET_ACTIVE_YEAR, { exam_type: examType, year }),
-  
+  getSettings: () => ApiClient.get(API_ENDPOINTS.SYSTEM_SETTINGS),
+
+  setActiveYear: (examType: string, year: number) =>
+    ApiClient.post(API_ENDPOINTS.SET_ACTIVE_YEAR, {
+      exam_type: examType,
+      year,
+    }),
+
   updateSettings: (settings: {
     data_source_priority?: string;
     automatic_backup?: boolean;
     email_notifications?: boolean;
-  }) => 
-    ApiClient.post(API_ENDPOINTS.UPDATE_SETTINGS, settings),
-  
-  getDataHealth: () => 
-    ApiClient.get(API_ENDPOINTS.DATA_HEALTH),
-  
-  getSystemStatus: () => 
-    ApiClient.get(API_ENDPOINTS.SYSTEM_STATUS),
+  }) => ApiClient.post(API_ENDPOINTS.UPDATE_SETTINGS, settings),
+
+  getDataHealth: () => ApiClient.get(API_ENDPOINTS.DATA_HEALTH),
+
+  getSystemStatus: () => ApiClient.get(API_ENDPOINTS.SYSTEM_STATUS),
 };
 
 // Authentication API Functions
 export const authApi = {
-  login: (username: string, password: string) => 
+  login: (username: string, password: string) =>
     ApiClient.post(API_ENDPOINTS.ADMIN_LOGIN, { username, password }, false),
-  
+
   register: (userData: {
     username: string;
     email: string;
     password: string;
     first_name?: string;
     last_name?: string;
-  }) => 
-    ApiClient.post(API_ENDPOINTS.ADMIN_REGISTER, userData, false),
-  
-  refresh: (refreshToken: string) => 
-    ApiClient.post(API_ENDPOINTS.ADMIN_REFRESH, { refresh: refreshToken }, false),
+  }) => ApiClient.post(API_ENDPOINTS.ADMIN_REGISTER, userData, false),
+
+  refresh: (refreshToken: string) =>
+    ApiClient.post(
+      API_ENDPOINTS.ADMIN_REFRESH,
+      { refresh: refreshToken },
+      false
+    ),
 };
 
 // Error handling utility
@@ -253,10 +281,10 @@ export const handleApiError = (error: any): string => {
   if (error.message) {
     return error.message;
   }
-  if (typeof error === 'string') {
+  if (typeof error === "string") {
     return error;
   }
-  return 'An unexpected error occurred';
+  return "An unexpected error occurred";
 };
 
 // Response type definitions

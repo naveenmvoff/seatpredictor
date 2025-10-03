@@ -1,8 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Download, Search, Filter, Calendar, RefreshCw, FileText } from "lucide-react";
+import {
+  Download,
+  Search,
+  Filter,
+  Calendar,
+  RefreshCw,
+  FileText,
+} from "lucide-react";
 import { userSearchesApi, handleApiError } from "@/lib/api";
+import DatePicker from "react-datepicker";
 
 // Interface for user search data
 interface UserSearchData {
@@ -53,7 +61,11 @@ interface UserSearchData {
 
 export default function UserSearches() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [dateRange, setDateRange] = useState("Aug 30, 2025 - Sep 29, 2025");
+  const today = new Date();
+  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
+    today,
+    today,
+  ]);
   const [examFilter, setExamFilter] = useState("All Exams");
   const [categoryFilter, setCategoryFilter] = useState("All Categories");
   const [resultsFilter, setResultsFilter] = useState("All Results");
@@ -72,7 +84,7 @@ export default function UserSearches() {
         search: searchQuery,
         exam_filter: examFilter,
         category_filter: categoryFilter,
-        results_filter: resultsFilter
+        results_filter: resultsFilter,
       });
 
       console.log("Fetched user data:==========", data);
@@ -93,7 +105,9 @@ export default function UserSearches() {
           ? new Date(item.search_time).toLocaleString()
           : "",
         results: item.results_count || 0,
-        resultsBadge: item.has_results ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800",
+        resultsBadge: item.has_results
+          ? "bg-green-100 text-green-800"
+          : "bg-red-100 text-red-800",
       }));
     } catch (error) {
       console.error("Error fetching user data:", handleApiError(error));
@@ -127,28 +141,29 @@ export default function UserSearches() {
 
     // Search query filter
     if (searchQuery) {
-      filtered = filtered.filter(item =>
-        item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.phone.includes(searchQuery)
+      filtered = filtered.filter(
+        (item) =>
+          item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.phone.includes(searchQuery)
       );
     }
 
     // Exam filter
     if (examFilter !== "All Exams") {
-      filtered = filtered.filter(item => item.exam === examFilter);
+      filtered = filtered.filter((item) => item.exam === examFilter);
     }
 
     // Category filter
     if (categoryFilter !== "All Categories") {
-      filtered = filtered.filter(item => item.category === categoryFilter);
+      filtered = filtered.filter((item) => item.category === categoryFilter);
     }
 
     // Results filter
     if (resultsFilter === "Has Results") {
-      filtered = filtered.filter(item => item.results > 0);
+      filtered = filtered.filter((item) => item.results > 0);
     } else if (resultsFilter === "Zero Results") {
-      filtered = filtered.filter(item => item.results === 0);
+      filtered = filtered.filter((item) => item.results === 0);
     }
 
     setFilteredData(filtered);
@@ -164,21 +179,16 @@ export default function UserSearches() {
     loadUserData();
   }, []);
 
-  // Refresh function for manual reload
-  const refreshData = () => {
-    loadUserData();
-  };
-
   // Export to CSV function
   const exportToCSV = async () => {
     setIsExporting(true);
-    
+
     try {
       await userSearchesApi.exportCsv({
         search_query: searchQuery,
         exam_filter: examFilter,
         category_filter: categoryFilter,
-        results_filter: resultsFilter
+        results_filter: resultsFilter,
       });
     } catch (error) {
       console.error("Error exporting CSV:", handleApiError(error));
@@ -202,20 +212,14 @@ export default function UserSearches() {
         </div>
         <div className="flex gap-2">
           <button
-            onClick={refreshData}
-            disabled={loading}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
-            {loading ? "Loading..." : "Refresh"}
-          </button>
-          <button 
             onClick={exportToCSV}
             disabled={isExporting || filteredData.length === 0}
             className="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Download className="w-4 h-4" />
-            {isExporting ? "Exporting..." : `Export CSV (${filteredData.length})`}
+            {isExporting
+              ? "Exporting..."
+              : `Export CSV (${filteredData.length})`}
           </button>
         </div>
       </div>
@@ -227,7 +231,8 @@ export default function UserSearches() {
           <h2 className="text-lg font-semibold text-gray-900">Filters</h2>
         </div>
         <p className="text-gray-600 text-sm mb-6">
-          Filter search results by various criteria. Showing {filteredData.length} of {searchData.length} records.
+          Filter search results by various criteria. Showing{" "}
+          {filteredData.length} of {searchData.length} records.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -244,16 +249,108 @@ export default function UserSearches() {
             />
           </div>
 
-          <div className="relative">
+          {/* <div className="relative">
+            <DatePicker
+              selectsRange={true}
+              startDate={dateRange[0]}
+              endDate={dateRange[1]}
+              onChange={(update) => {
+                setDateRange(update as [Date | null, Date | null]);
+              }}
+              dateFormat="MMM d, yyyy"
+              isClearable={true}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholderText="Select date range"
+            />
+          </div>   */}
+
+          {/* <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <Calendar className="w-4 h-4 text-gray-400" />
             </div>
-            <input
-              type="text"
-              placeholder="Date range"
-              value={dateRange}
-              onChange={(e) => setDateRange(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+
+            <DatePicker
+              selectsRange
+              startDate={dateRange[0]}
+              endDate={dateRange[1]}
+              onChange={(update) => {
+                setDateRange(update as [Date | null, Date | null]);
+              }}
+              dateFormat="MMM d, yyyy"
+              placeholderText="Select date range"
+              shouldCloseOnSelect={false}
+              customInput={
+                <input
+                  type="text"
+                  readOnly
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  value={
+                    dateRange[0] && dateRange[1]
+                      ? `${dateRange[0].toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })} - ${dateRange[1].toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}`
+                      : ""
+                  }
+                />
+              }
+            />
+          </div> */}
+
+          <div className="relative flex items-center">
+            {/* Calendar Icon */}
+            <div className="absolute left-0 pl-3 flex items-center text-gray-400">
+              <Calendar className="w-4 h-4" />
+            </div>
+
+            {/* Date Picker with custom input */}
+            <DatePicker
+              selectsRange
+              startDate={dateRange[0]}
+              endDate={dateRange[1]}
+              onChange={(update) => {
+                setDateRange(update as [Date | null, Date | null]);
+              }}
+              dateFormat="MMM d, yyyy"
+              shouldCloseOnSelect={false}
+              customInput={
+                <div className="w-full flex items-center">
+                  <input
+                    type="text"
+                    readOnly
+                    placeholder="Select date range"
+                    className="w-full pl-10 pr-8 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={
+                      dateRange[0] && dateRange[1]
+                        ? `${dateRange[0].toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          })} - ${dateRange[1].toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          })}`
+                        : ""
+                    }
+                  />
+                  {/* Clear button */}
+                  {dateRange[0] && dateRange[1] && (
+                    <button
+                      type="button"
+                      onClick={() => setDateRange([null, null])}
+                      className="absolute right-2 text-gray-400 hover:text-gray-600"
+                    >
+                      ✖
+                    </button>
+                  )}
+                </div>
+              }
             />
           </div>
 
@@ -371,7 +468,9 @@ export default function UserSearches() {
                     colSpan={10}
                     className="px-6 py-4 text-center text-gray-500"
                   >
-                    {searchData.length === 0 ? "No search records found." : "No records match your filters."}
+                    {searchData.length === 0
+                      ? "No search records found."
+                      : "No records match your filters."}
                   </td>
                 </tr>
               ) : (

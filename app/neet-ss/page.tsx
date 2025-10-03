@@ -378,7 +378,7 @@ export default function Results() {
   const handleDownloadPDF = () => {
     const doc = new jsPDF();
     doc.setFontSize(14);
-    doc.text("NEET PG Seat Predictor Results", 14, 16);
+    doc.text("NEET SS Seat Predictor Results", 14, 16);
 
     const tableData = (apiRows || currentColleges).map(
       (row: any, index: number) => [
@@ -753,10 +753,10 @@ export default function Results() {
               <thead className="bg-gray-50 border-b">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    # Sr. No
+                    Sr. No
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Rank ↑
+                    Rank 
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     College ↑

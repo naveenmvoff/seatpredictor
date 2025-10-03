@@ -79,6 +79,8 @@ export default function Results() {
   const categoryDropdownRef = useRef<HTMLDivElement>(null);
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [categorySearch, setCategorySearch] = useState("");
+  
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
 
   useEffect(() => {
     const fetchGroupCategories = async () => {
@@ -342,6 +344,8 @@ export default function Results() {
     }
   };
 
+  
+
   const totalPages = Math.ceil(filteredColleges.length / rowsPerPage);
   const startIndex = (currentPage - 1) * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
@@ -579,13 +583,15 @@ export default function Results() {
                 Specialization
               </label>
               <div ref={specializationDropdownRef} className="relative w-full">
-                 <div
-                   onClick={() => setShowSpecializationDropdown((prev) => !prev)}
-                   className={`px-3 py-2 bg-white border rounded-md cursor-pointer text-sm focus:outline-none focus:ring-1 focus:ring-slate-700 focus:border-transparent whitespace-nowrap overflow-hidden truncate ${
-                     !formData.specialization ? "border-red-500" : "border-gray-300"
-                   }`}
-                   title={formData.specialization || specializationData.group}
-                 >
+                <div
+                  onClick={() => setShowSpecializationDropdown((prev) => !prev)}
+                  className={`px-3 py-2 bg-white border rounded-md cursor-pointer text-sm focus:outline-none focus:ring-1 focus:ring-slate-700 focus:border-transparent whitespace-nowrap overflow-hidden truncate ${
+                    !formData.specialization
+                      ? "border-red-500"
+                      : "border-gray-300"
+                  }`}
+                  title={formData.specialization || specializationData.group}
+                >
                   {formData.specialization || specializationData.group}
                 </div>
 
@@ -744,19 +750,19 @@ export default function Results() {
               <thead className="bg-gray-50 border-b">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    # Sr. No
+                    Sr. No
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Rank ↑
+                    Rank 
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    College ↑
+                    College 
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    State ↑
+                    State 
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Category ↑
+                    Category 
                   </th>
                 </tr>
               </thead>
@@ -828,6 +834,32 @@ export default function Results() {
                       </tr>
                     ))}
               </tbody>
+
+              {/* <tbody className="bg-white divide-y divide-gray-200">
+                {(apiRows || currentColleges).map((row: any, index: number) => (
+                  <tr
+                    key={`row-${row.allotted_institute || row.name}-${
+                      row.rank_no || row.rank
+                    }-${index}`}
+                  >
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {startIndex + index + 1}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {row.rank_no || row.rank}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {row.allotted_institute || row.name}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {row.state}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {row.candidate_category || row.category}
+                    </td>
+                  </tr>
+                ))}
+              </tbody> */}
             </table>
           </div>
 

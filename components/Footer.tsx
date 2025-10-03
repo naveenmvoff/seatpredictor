@@ -61,7 +61,9 @@ export default function Footer() {
             <h3 className="text-gray-600 font-medium mb-4">Contact Us</h3>
             <div className="space-y-2 text-sm text-gray-600 mb-6">
               <p>help@doctutorials</p>
-              <p>+91 7097434567 / +91 7097634567 (10 am - 7 pm)</p>
+              <p>+91 7097434567</p>
+              <p>+91 7097634567</p>
+              {/* <p>(10 am - 7 pm)</p> */}
             </div>
           </div>
 

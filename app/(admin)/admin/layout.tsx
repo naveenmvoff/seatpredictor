@@ -1,30 +1,32 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import type { ReactNode } from "react"
-import { 
-  BarChart3, 
-  Upload, 
-  Search, 
-  Settings, 
-  User, 
-  LogOut, 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import type { ReactNode } from "react";
+import {
+  BarChart3,
+  Upload,
+  Search,
+  Settings,
+  User,
+  LogOut,
   Bell,
   Shield,
   Database,
   Users,
   FileText,
   TrendingUp,
-  AlertCircle
-} from "lucide-react"
+  AlertCircle,
+} from "lucide-react";
+
+import { handleLogout as logout } from "@/lib/token";
 
 interface AdminLayoutProps {
-  children: ReactNode
+  children: ReactNode;
 }
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   const navigationItems = [
     {
@@ -32,7 +34,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       items: [
         {
           name: "Dashboard",
-          href: "/admin",
+          href: "/admin/dashboard",
           icon: <BarChart3 className="w-5 h-5" />,
           description: "Analytics Overview",
         },
@@ -56,12 +58,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         },
       ],
     },
-  ]
+  ];
 
-  const handleLogout = () => {
-    // Implement logout logic
-    console.log("Logging out...")
-  }
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -84,31 +82,39 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         <div className="flex-1 p-4">
           {navigationItems.map((section) => (
             <div key={section.title} className="mb-6">
-              <h2 className="text-slate-400 text-xs font-medium uppercase tracking-wider mb-3">{section.title}</h2>
+              <h2 className="text-slate-400 text-xs font-medium uppercase tracking-wider mb-3">
+                {section.title}
+              </h2>
               <nav className="space-y-1">
                 {section.items.map((item) => {
-                  const isActive = pathname === item.href
+                  const isActive = pathname === item.href;
                   return (
                     <Link
                       key={item.name}
                       href={item.href}
                       className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
-                        isActive ? "bg-slate-700 text-white" : "text-slate-300 hover:bg-slate-700 hover:text-white"
+                        isActive
+                          ? "bg-slate-700 text-white"
+                          : "text-slate-300 hover:bg-slate-700 hover:text-white"
                       }`}
                     >
-                      <span className="text-base flex-shrink-0">{item.icon}</span>
+                      <span className="text-base flex-shrink-0">
+                        {item.icon}
+                      </span>
                       <div>
                         <div className="font-medium">{item.name}</div>
-                        <div className="text-xs text-slate-400">{item.description}</div>
+                        <div className="text-xs text-slate-400">
+                          {item.description}
+                        </div>
                       </div>
                     </Link>
-                  )
+                  );
                 })}
               </nav>
             </div>
           ))}
         </div>
-        
+
         {/* User Info */}
         <div className="p-4 border-t border-slate-700">
           {/* <div className="flex items-center space-x-3 mb-3">
@@ -126,10 +132,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               </div>
             </div>
           </div> */}
-          
+
           <div className="flex items-center gap-2">
-            <button 
-              onClick={handleLogout}
+            <button
+              onClick={logout}
               className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-xs text-red-400 hover:bg-red-900/20 rounded-lg transition-colors"
             >
               <LogOut className="w-4 h-4" />
@@ -150,11 +156,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         <header className="bg-white border-b border-gray-200 px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <h1 className="text-xl font-semibold text-gray-900">Seat Predictor Admin Portal</h1>
+              <h1 className="text-xl font-semibold text-gray-900">
+                Seat Predictor Admin Portal
+              </h1>
             </div>
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-              </div>
+              <div className="flex items-center gap-2 text-sm text-gray-600"></div>
               <div className="text-sm text-gray-600">Welcome, Admin</div>
             </div>
           </div>
@@ -164,5 +171,5 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         <main className="flex-1 overflow-auto p-6">{children}</main>
       </div>
     </div>
-  )
+  );
 }
